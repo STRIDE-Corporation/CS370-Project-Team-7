@@ -1,40 +1,74 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.JOptionPane;
 
 public class LoginController {
 
     private LoginScreen loginView;
-    // private DatabaseManager dbManager; // We will uncomment this when the DB is ready
+    private AccountManager accountManager;
+    private WorkoutManager workoutManager;
 
-    public LoginController(LoginScreen loginView /*, DatabaseManager dbManager */) {
+    public LoginController(LoginScreen loginView, AccountManager accountManager, WorkoutManager workoutManager) {
         this.loginView = loginView;
-        // this.dbManager = dbManager;
+        this.accountManager = accountManager;
+        this.workoutManager = workoutManager;
 
-        // Tell the View what to do when the button is clicked
         this.loginView.addLoginListener(new LoginListener());
+        this.loginView.addRegisterListener(new RegisterListener());
+        this.loginView.addCloseListener(new CloseListener());
     }
 
-    // Inner class that handles the actual button click event
     private class LoginListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            String username = loginView.getUsername();
+            String username = loginView.getUsername().trim();
             String password = loginView.getPassword();
 
-            // mock authentication, implement DB access for password and username
-            // Later, this will be: if(dbManager.authenticate(username, password))
-            if (username.equals("William") && password.equals("")) {
+            if (username.isEmpty() || password.isEmpty()) {
+                loginView.displayErrorMessage("Username and password cannot be empty.");
+                return;
+            }
 
-                // 1. Success! Open the Main Dashboard and pass the username
-                MainDashBoard dashboard = new MainDashBoard(username);
+            UserProfile user = accountManager.login(username, password);
+
+            if (user != null) {
+                MainDashBoard dashboard = new MainDashBoard(user.getUsername());
+
+                // this is number 3
+                new DashboardController(dashboard, user, workoutManager, accountManager);
+
                 dashboard.setVisible(true);
-
-                // 2. Close the Login Screen
                 loginView.dispose();
-
             } else {
-                // 3. Failure! Tell the View to show an error
                 loginView.displayErrorMessage("Invalid username or password.");
+            }
+        }
+    }
+
+    private class RegisterListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            RegisterScreen registerScreen = new RegisterScreen();
+            new RegisterController(registerScreen, accountManager, loginView);
+
+            registerScreen.setVisible(true);
+            loginView.setVisible(false);
+        }
+    }
+
+    private class CloseListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+
+            int confirm = JOptionPane.showConfirmDialog(
+                    loginView,
+                    "Are you sure you want to exit?",
+                    "Exit",
+                    JOptionPane.YES_NO_OPTION
+            );
+
+            if (confirm == JOptionPane.YES_OPTION) {
+                System.exit(0);
             }
         }
     }
