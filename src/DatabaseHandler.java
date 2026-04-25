@@ -39,6 +39,7 @@ public class DatabaseHandler {
                 exercise_name TEXT NOT NULL,
                 sets INTEGER NOT NULL,
                 reps INTEGER NOT NULL,
+                duration INTEGER NOT NULL,
                 FOREIGN KEY (workout_id) REFERENCES workouts(workout_id)
             );
             """;
