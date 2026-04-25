@@ -38,31 +38,23 @@ public class LogWorkoutController {
                     return;
                 }
 
-                int sets = Integer.parseInt(view.getSets());
-                int reps = Integer.parseInt(view.getReps());
-
-                if (sets <= 0 || reps <= 0) {
-                    view.showError("Sets and reps must be positive.");
+                if (durationText.isEmpty()) {
+                    view.showError("Exercise duration is required.");
                     return;
                 }
 
+                int sets = Integer.parseInt(view.getSets());
+                int reps = Integer.parseInt(view.getReps());
+                int duration = Integer.parseInt(durationText);
+
+                if (sets <= 0 || reps <= 0 || duration <= 0) {
+                    view.showError("Sets, reps, and duration must be positive.");
+                    return;
+                }
+
+                //create workout only once
                 if (!workoutStarted) {
-                    if (durationText.isEmpty()) {
-                        view.showError("Duration is required.");
-                        return;
-                    }
-
-                    int duration = Integer.parseInt(durationText);
-
-                    if (duration <= 0) {
-                        view.showError("Duration must be positive.");
-                        return;
-                    }
-
-                    currentWorkout = workoutManager.addWorkout(
-                            currentUser.getUsername(),
-                            duration
-                    );
+                    currentWorkout = workoutManager.addWorkout(currentUser.getUsername());
 
                     if (currentWorkout == null) {
                         view.showError("Failed to create workout.");
@@ -72,14 +64,22 @@ public class LogWorkoutController {
                     workoutStarted = true;
                 }
 
+                //add exercise
                 workoutManager.addExerciseToWorkout(
                         currentWorkout.getWorkoutId(),
                         exercise,
                         sets,
-                        reps
+                        reps,
+                        duration
                 );
 
-                view.appendExercise("Exercise: " + exercise + " | Sets: " + sets + " | Reps: " + reps);
+                view.appendExercise(
+                        "Exercise: " + exercise +
+                                " | Sets: " + sets +
+                                " | Reps: " + reps +
+                                " | Duration: " + duration + " min"
+                );
+
                 view.clearExerciseFields();
 
             } catch (NumberFormatException ex) {
