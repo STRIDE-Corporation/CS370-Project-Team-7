@@ -5,7 +5,121 @@ public class LogWorkoutController {
 
     private LogWorkoutScreen view;
     private MainDashBoard dashboardView;
+    private WorkoutManager workoutManager;import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class LogWorkoutController {
+
+    private LogWorkoutScreen view;
+    private MainDashBoard dashboardView;
     private WorkoutManager workoutManager;
+    private UserProfile currentUser;
+
+    private Workout currentWorkout;
+    private boolean workoutStarted = false;
+
+    public LogWorkoutController(LogWorkoutScreen view,
+                                MainDashBoard dashboardView,
+                                WorkoutManager workoutManager,
+                                UserProfile currentUser) {
+
+        this.view = view;
+        this.dashboardView = dashboardView;
+        this.workoutManager = workoutManager;
+        this.currentUser = currentUser;
+
+        this.view.addAddExerciseListener(new AddExerciseListener());
+        this.view.addFinishWorkoutListener(new FinishWorkoutListener());
+        this.view.addBackListener(new BackListener());
+    }
+
+    private class AddExerciseListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                String exercise = view.getExerciseName();
+                String durationText = view.getDuration();
+
+                if (exercise.isEmpty()) {
+                    view.showError("Exercise name required.");
+                    return;
+                }
+
+                if (durationText.isEmpty()) {
+                    view.showError("Exercise duration is required.");
+                    return;
+                }
+
+                int sets = Integer.parseInt(view.getSets());
+                int reps = Integer.parseInt(view.getReps());
+                int duration = Integer.parseInt(durationText);
+
+                if (sets <= 0 || reps <= 0 || duration <= 0) {
+                    view.showError("Sets, reps, and duration must be positive.");
+                    return;
+                }
+
+                if (!workoutStarted) {
+                    currentWorkout = workoutManager.addWorkout(currentUser.getUsername());
+
+                    if (currentWorkout == null) {
+                        view.showError("Failed to create workout.");
+                        return;
+                    }
+
+                    workoutStarted = true;
+                }
+
+                ExerciseEntry entry = new ExerciseEntry(
+                        0,
+                        exercise,
+                        sets,
+                        reps,
+                        duration
+                );
+
+                workoutManager.addExerciseToWorkout(
+                        currentWorkout.getWorkoutId(),
+                        entry
+                );
+
+                view.appendExercise(
+                        "Exercise: " + exercise +
+                        " | Sets: " + sets +
+                        " | Reps: " + reps +
+                        " | Duration: " + duration + " min"
+                );
+
+                view.clearExerciseFields();
+
+            } catch (NumberFormatException ex) {
+                view.showError("Please enter valid numbers.");
+            }
+        }
+    }
+
+    private class FinishWorkoutListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (!workoutStarted) {
+                view.showError("Add at least one exercise before finishing the workout.");
+                return;
+            }
+
+            view.showMessage("Workout saved successfully!");
+            dashboardView.setVisible(true);
+            view.dispose();
+        }
+    }
+
+    private class BackListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            dashboardView.setVisible(true);
+            view.dispose();
+        }
+    }
+}
     private UserProfile currentUser;
 
     private Workout currentWorkout;
