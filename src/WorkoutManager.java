@@ -36,17 +36,17 @@ public class WorkoutManager {
         return null;
     }
 
-    public void addExerciseToWorkout(int workoutId, String exerciseName, int sets, int reps, int duration) {
+    public void addExerciseToWorkout(int workoutId, ExerciseEntry entry) {
         String sql = "INSERT INTO exercise_entries(workout_id, exercise_name, sets, reps, duration) VALUES(?,?,?,?,?)";
 
         try (Connection conn = db.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, workoutId);
-            pstmt.setString(2, exerciseName);
-            pstmt.setInt(3, sets);
-            pstmt.setInt(4, reps);
-            pstmt.setInt(5, duration);
+            pstmt.setString(2, entry.getExerciseName());
+            pstmt.setInt(3, entry.getSets());
+            pstmt.setInt(4, entry.getReps());
+            pstmt.setInt(5, entry.getDuration());
 
             pstmt.executeUpdate();
 
@@ -59,14 +59,14 @@ public class WorkoutManager {
 
     private void updateWorkoutDuration(int workoutId) {
         String sql = """
-        UPDATE workouts
-        SET duration = (
-            SELECT SUM(duration)
-            FROM exercise_entries
+            UPDATE workouts
+            SET duration = (
+                SELECT SUM(duration)
+                FROM exercise_entries
+                WHERE workout_id = ?
+            )
             WHERE workout_id = ?
-        )
-        WHERE workout_id = ?
-    """;
+            """;
 
         try (Connection conn = db.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -103,7 +103,7 @@ public class WorkoutManager {
 
                 history.append("Workout ID: ").append(workoutId).append("\n");
                 history.append("Date: ").append(dateTime).append("\n");
-                history.append("Duration: ").append(duration).append(" minutes\n");
+                history.append("Total Duration: ").append(duration).append(" minutes\n");
                 history.append("Exercises:\n");
 
                 try (PreparedStatement exerciseStmt = conn.prepareStatement(exerciseSql)) {
@@ -114,10 +114,19 @@ public class WorkoutManager {
 
                     while (exerciseRs.next()) {
                         hasExercises = true;
-                        history.append("  Exercise: ").append(exerciseRs.getString("exercise_name")).append("\n");
-                        history.append("  Sets: ").append(exerciseRs.getInt("sets")).append("\n");
-                        history.append("  Reps: ").append(exerciseRs.getInt("reps")).append("\n");
-                        history.append("  Duration: ").append(exerciseRs.getInt("duration")).append(" minutes\n");
+
+                        ExerciseEntry entry = new ExerciseEntry(
+                                exerciseRs.getInt("exercise_entry_id"),
+                                exerciseRs.getString("exercise_name"),
+                                exerciseRs.getInt("sets"),
+                                exerciseRs.getInt("reps"),
+                                exerciseRs.getInt("duration")
+                        );
+
+                        history.append("  Exercise: ").append(entry.getExerciseName()).append("\n");
+                        history.append("  Sets: ").append(entry.getSets()).append("\n");
+                        history.append("  Reps: ").append(entry.getReps()).append("\n");
+                        history.append("  Duration: ").append(entry.getDuration()).append(" minutes\n");
                         history.append("  -------------------\n");
                     }
 
@@ -154,7 +163,6 @@ public class WorkoutManager {
                     PreparedStatement deleteExercisesStmt = conn.prepareStatement(deleteExercisesSql);
                     PreparedStatement deleteWorkoutStmt = conn.prepareStatement(deleteWorkoutSql)
             ) {
-                //confirm user is owner of workout
                 checkStmt.setInt(1, workoutId);
                 checkStmt.setString(2, username);
 
@@ -165,11 +173,9 @@ public class WorkoutManager {
                     return false;
                 }
 
-                //delete array of exercises
                 deleteExercisesStmt.setInt(1, workoutId);
                 deleteExercisesStmt.executeUpdate();
 
-                //delete workout
                 deleteWorkoutStmt.setInt(1, workoutId);
                 deleteWorkoutStmt.setString(2, username);
 
