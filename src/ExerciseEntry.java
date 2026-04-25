@@ -4,12 +4,14 @@ public class ExerciseEntry {
     private String exerciseName;
     private int sets;
     private int reps;
+    private int duration;
 
-    public ExerciseEntry(int exerciseEntryId, String exerciseName, int sets, int reps) {
+    public ExerciseEntry(int exerciseEntryId, String exerciseName, int sets, int reps, int duration) {
         this.exerciseEntryId = exerciseEntryId;
         this.exerciseName = exerciseName;
         this.sets = sets;
         this.reps = reps;
+        this.duration = duration;
     }
 
     public int getExerciseEntryId() {
@@ -28,6 +30,10 @@ public class ExerciseEntry {
         return reps;
     }
 
+    public int getDuration() {
+        return duration;
+    }
+
     public void setExerciseName(String exerciseName) {
         this.exerciseName = exerciseName;
     }
@@ -40,10 +46,15 @@ public class ExerciseEntry {
         this.reps = reps;
     }
 
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
+
     public void viewExercise() {
         System.out.println("Exercise ID: " + exerciseEntryId);
         System.out.println("Exercise Name: " + exerciseName);
         System.out.println("Sets: " + sets);
         System.out.println("Reps: " + reps);
+        System.out.println("Duration: " + duration + " minutes");
     }
 }
