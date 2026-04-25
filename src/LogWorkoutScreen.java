@@ -23,7 +23,7 @@ public class LogWorkoutScreen extends JFrame {
 
         JPanel inputPanel = new JPanel(new GridLayout(5, 2, 10, 10));
 
-        inputPanel.add(new JLabel("Duration (minutes):"));
+        inputPanel.add(new JLabel("Exercise Duration (minutes):"));
         durationField = new JTextField();
         inputPanel.add(durationField);
 
@@ -78,6 +78,7 @@ public class LogWorkoutScreen extends JFrame {
     }
 
     public void clearExerciseFields() {
+        durationField.setText("");
         exerciseNameField.setText("");
         setsField.setText("");
         repsField.setText("");
