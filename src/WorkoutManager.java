@@ -9,7 +9,7 @@ public class WorkoutManager {
         this.db = db;
     }
 
-    public Workout addWorkout(String username, int duration) {
+    public Workout addWorkout(String username) {
         String sql = "INSERT INTO workouts(username, workout_datetime, duration) VALUES(?,?,?)";
 
         try (Connection conn = db.connect();
@@ -19,14 +19,14 @@ public class WorkoutManager {
 
             pstmt.setString(1, username);
             pstmt.setString(2, workoutDateTime);
-            pstmt.setInt(3, duration);
+            pstmt.setInt(3, 0);
 
             pstmt.executeUpdate();
 
             ResultSet keys = pstmt.getGeneratedKeys();
             if (keys.next()) {
                 int workoutId = keys.getInt(1);
-                return new Workout(workoutId, username, duration);
+                return new Workout(workoutId, username, 0);
             }
 
         } catch (SQLException e) {
@@ -36,8 +36,8 @@ public class WorkoutManager {
         return null;
     }
 
-    public void addExerciseToWorkout(int workoutId, String exerciseName, int sets, int reps) {
-        String sql = "INSERT INTO exercise_entries(workout_id, exercise_name, sets, reps) VALUES(?,?,?,?)";
+    public void addExerciseToWorkout(int workoutId, String exerciseName, int sets, int reps, int duration) {
+        String sql = "INSERT INTO exercise_entries(workout_id, exercise_name, sets, reps, duration) VALUES(?,?,?,?,?)";
 
         try (Connection conn = db.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -46,7 +46,33 @@ public class WorkoutManager {
             pstmt.setString(2, exerciseName);
             pstmt.setInt(3, sets);
             pstmt.setInt(4, reps);
+            pstmt.setInt(5, duration);
 
+            pstmt.executeUpdate();
+
+            updateWorkoutDuration(workoutId);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void updateWorkoutDuration(int workoutId) {
+        String sql = """
+        UPDATE workouts
+        SET duration = (
+            SELECT SUM(duration)
+            FROM exercise_entries
+            WHERE workout_id = ?
+        )
+        WHERE workout_id = ?
+    """;
+
+        try (Connection conn = db.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, workoutId);
+            pstmt.setInt(2, workoutId);
             pstmt.executeUpdate();
 
         } catch (SQLException e) {
@@ -91,6 +117,7 @@ public class WorkoutManager {
                         history.append("  Exercise: ").append(exerciseRs.getString("exercise_name")).append("\n");
                         history.append("  Sets: ").append(exerciseRs.getInt("sets")).append("\n");
                         history.append("  Reps: ").append(exerciseRs.getInt("reps")).append("\n");
+                        history.append("  Duration: ").append(exerciseRs.getInt("duration")).append(" minutes\n");
                         history.append("  -------------------\n");
                     }
 
