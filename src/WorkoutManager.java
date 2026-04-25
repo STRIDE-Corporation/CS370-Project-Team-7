@@ -115,18 +115,34 @@ public class WorkoutManager {
     }
 
     public boolean deleteWorkout(int workoutId, String username) {
+        String checkSql = "SELECT workout_id FROM workouts WHERE workout_id = ? AND username = ?";
         String deleteExercisesSql = "DELETE FROM exercise_entries WHERE workout_id = ?";
         String deleteWorkoutSql = "DELETE FROM workouts WHERE workout_id = ? AND username = ?";
 
         try (Connection conn = db.connect()) {
             conn.setAutoCommit(false);
 
-            try (PreparedStatement deleteExercisesStmt = conn.prepareStatement(deleteExercisesSql);
-                 PreparedStatement deleteWorkoutStmt = conn.prepareStatement(deleteWorkoutSql)) {
+            try (
+                    PreparedStatement checkStmt = conn.prepareStatement(checkSql);
+                    PreparedStatement deleteExercisesStmt = conn.prepareStatement(deleteExercisesSql);
+                    PreparedStatement deleteWorkoutStmt = conn.prepareStatement(deleteWorkoutSql)
+            ) {
+                //confirm user is owner of workout
+                checkStmt.setInt(1, workoutId);
+                checkStmt.setString(2, username);
 
+                ResultSet rs = checkStmt.executeQuery();
+
+                if (!rs.next()) {
+                    conn.rollback();
+                    return false;
+                }
+
+                //delete array of exercises
                 deleteExercisesStmt.setInt(1, workoutId);
                 deleteExercisesStmt.executeUpdate();
 
+                //delete workout
                 deleteWorkoutStmt.setInt(1, workoutId);
                 deleteWorkoutStmt.setString(2, username);
 
