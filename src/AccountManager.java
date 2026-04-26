@@ -3,15 +3,18 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class AccountManager {
+public class AccountManager 
+{
 
     private final DatabaseHandler db;
 
-    public AccountManager(DatabaseHandler db) {
+    public AccountManager(DatabaseHandler db) 
+    {
         this.db = db;
     }
 
-    public boolean usernameExists(String username) {
+    public boolean usernameExists(String username) 
+    {
         String sql = "SELECT 1 FROM users WHERE username = ?";
 
         try (Connection conn = db.connect();
@@ -21,13 +24,15 @@ public class AccountManager {
             ResultSet rs = pstmt.executeQuery();
             return rs.next();
 
-        } catch (SQLException e) {
+        } catch (SQLException e) 
+        {
             e.printStackTrace();
             return false;
         }
     }
 
-    public UserProfile createAccount(String username, String password, int height, int weight, UserProfile.Goal goal) {
+    public UserProfile createAccount(String username, String password, int height, int weight, UserProfile.Goal goal) 
+    {
         String sql = "INSERT INTO users(username, password, height, weight, goal) VALUES(?,?,?,?,?)";
 
         try (Connection conn = db.connect();
@@ -42,13 +47,15 @@ public class AccountManager {
             pstmt.executeUpdate();
             return login(username, password);
 
-        } catch (SQLException e) {
+        } catch (SQLException e) 
+        {
             e.printStackTrace();
             return null;
         }
     }
 
-    public UserProfile login(String username, String password) {
+    public UserProfile login(String username, String password) 
+    {
         String sql = "SELECT * FROM users WHERE username = ? AND password = ?";
 
         try (Connection conn = db.connect();
@@ -70,14 +77,16 @@ public class AccountManager {
                 return new UserProfile(userId, username, password, height, weight, goal);
             }
 
-        } catch (SQLException e) {
+        } catch (SQLException e) 
+        {
             e.printStackTrace();
         }
 
         return null;
     }
 
-    public void displayAllUsers() {
+    public void displayAllUsers() 
+    {
         String sql = "SELECT * FROM users";
 
         try (Connection conn = db.connect();
@@ -93,7 +102,8 @@ public class AccountManager {
                 System.out.println("-------------------");
             }
 
-        } catch (SQLException e) {
+        } catch (SQLException e) 
+        {
             e.printStackTrace();
         }
     }
