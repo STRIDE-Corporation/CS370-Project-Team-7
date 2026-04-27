@@ -8,22 +8,24 @@ public class ProfileScreen extends JFrame {
     private JLabel heightLabel;
     private JLabel weightLabel;
     private JLabel goalLabel;
+    private JLabel unitPreferenceLabel;
 
     private JButton backButton;
 
     public ProfileScreen() {
         setTitle("Profile");
-        setSize(400, 250);
+        setSize(450, 300);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
         JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(5, 1, 10, 10));
+        panel.setLayout(new GridLayout(6, 1, 10, 10));
 
         usernameLabel = new JLabel();
         heightLabel = new JLabel();
         weightLabel = new JLabel();
         goalLabel = new JLabel();
+        unitPreferenceLabel = new JLabel();
 
         backButton = new JButton("Back");
 
@@ -31,6 +33,7 @@ public class ProfileScreen extends JFrame {
         panel.add(heightLabel);
         panel.add(weightLabel);
         panel.add(goalLabel);
+        panel.add(unitPreferenceLabel);
         panel.add(backButton);
 
         add(panel);
@@ -38,9 +41,20 @@ public class ProfileScreen extends JFrame {
 
     public void setProfileData(UserProfile user) {
         usernameLabel.setText("Username: " + user.getUsername());
-        heightLabel.setText("Height: " + user.getHeight());
-        weightLabel.setText("Weight: " + user.getWeight());
+
+        if (user.getUnitPreference() == UserProfile.UnitPreference.METRIC) {
+            int heightCm = (int) Math.round(user.getHeight() * 2.54);
+            int weightKg = (int) Math.round(user.getWeight() * 0.453592);
+
+            heightLabel.setText("Height: " + heightCm + " cm");
+            weightLabel.setText("Weight: " + weightKg + " kg");
+        } else {
+            heightLabel.setText("Height: " + user.getHeight() + " in");
+            weightLabel.setText("Weight: " + user.getWeight() + " lbs");
+        }
+
         goalLabel.setText("Goal: " + user.getGoal());
+        unitPreferenceLabel.setText("Display Units: " + user.getUnitPreference());
     }
 
     public void addBackListener(ActionListener listener) {

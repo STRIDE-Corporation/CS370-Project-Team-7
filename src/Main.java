@@ -1,8 +1,18 @@
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+
 
 public class Main {
     public static void main(String[] args) {
 
+         //This gives us a consistent GUI across MacOS and WINDOWS
+        try {
+            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        ////
+        //code we had before upgrade, is onwards.
         SwingUtilities.invokeLater(() -> {
 
             // Initialize database

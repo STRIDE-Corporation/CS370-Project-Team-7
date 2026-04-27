@@ -25,6 +25,7 @@ public class RegisterController {
             String heightStr = registerView.getHeightInput();
             String weightStr = registerView.getWeightInput();
             String goalStr = registerView.getGoal();
+            UserProfile.UnitPreference unitPreference = registerView.getUnitPreference();
 
             if (username.isEmpty() || password.isEmpty() ||
                     heightStr.isEmpty() || weightStr.isEmpty()) {
@@ -55,7 +56,7 @@ public class RegisterController {
             UserProfile.Goal goal = UserProfile.Goal.valueOf(goalStr);
 
             UserProfile user = accountManager.createAccount(
-                    username, password, height, weight, goal
+                    username, password, height, weight, goal, unitPreference
             );
 
             if (user != null) {

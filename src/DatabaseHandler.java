@@ -19,7 +19,8 @@ public class DatabaseHandler {
                 password TEXT NOT NULL,
                 height INTEGER NOT NULL,
                 weight INTEGER NOT NULL,
-                goal TEXT NOT NULL
+                goal TEXT NOT NULL,
+                unit_preference TEXT NOT NULL DEFAULT 'IMPERIAL'
             );
             """;
 
