@@ -84,7 +84,25 @@ public class AccountManager
 
         return null;
     }
+    public boolean updateProfile(int userId, int newHeight, int newWeight, UserProfile.Goal newGoal) {
+        String sql = "UPDATE users SET height = ?, weight = ?, goal = ? WHERE user_id = ?";
 
+        try (Connection conn = db.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, newHeight);
+            pstmt.setInt(2, newWeight);
+            pstmt.setString(3, newGoal.name());
+            pstmt.setInt(4, userId);
+
+            int rowsAffected = pstmt.executeUpdate();
+            return rowsAffected > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
     public void displayAllUsers() 
     {
         String sql = "SELECT * FROM users";
