@@ -27,8 +27,8 @@ public class RegisterScreen extends JFrame {
 
         JLabel usernameLabel = new JLabel("Username:");
         JLabel passwordLabel = new JLabel("Password:");
-        JLabel heightLabel = new JLabel("Height:");
-        JLabel weightLabel = new JLabel("Weight:");
+        JLabel heightLabel = new JLabel("Height (in):");
+        JLabel weightLabel = new JLabel("Weight (lbs):");
         JLabel goalLabel = new JLabel("Goal:");
         JLabel unitLabel = new JLabel("Units:");
 

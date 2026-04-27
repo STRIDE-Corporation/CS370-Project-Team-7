@@ -40,7 +40,7 @@ public class DashboardController {
         @Override
         public void actionPerformed(ActionEvent e) {
             ProfileScreen profileScreen = new ProfileScreen();
-            new ProfileController(profileScreen, dashboardView, currentUser);
+            new ProfileController(profileScreen, dashboardView, currentUser, accountManager);
 
             profileScreen.setVisible(true);
             dashboardView.setVisible(false);

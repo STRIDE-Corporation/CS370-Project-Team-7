@@ -10,16 +10,17 @@ public class ProfileScreen extends JFrame {
     private JLabel goalLabel;
     private JLabel unitPreferenceLabel;
 
+    private JButton editButton;
     private JButton backButton;
 
     public ProfileScreen() {
         setTitle("Profile");
-        setSize(450, 300);
+        setSize(450, 350);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(6, 1, 10, 10));
+        JPanel panel = new JPanel(new GridLayout(7, 1, 10, 10));
+        panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
         usernameLabel = new JLabel();
         heightLabel = new JLabel();
@@ -27,6 +28,7 @@ public class ProfileScreen extends JFrame {
         goalLabel = new JLabel();
         unitPreferenceLabel = new JLabel();
 
+        editButton = new JButton("Edit Profile");
         backButton = new JButton("Back");
 
         panel.add(usernameLabel);
@@ -34,6 +36,7 @@ public class ProfileScreen extends JFrame {
         panel.add(weightLabel);
         panel.add(goalLabel);
         panel.add(unitPreferenceLabel);
+        panel.add(editButton);
         panel.add(backButton);
 
         add(panel);
@@ -53,8 +56,12 @@ public class ProfileScreen extends JFrame {
             weightLabel.setText("Weight: " + user.getWeight() + " lbs");
         }
 
-        goalLabel.setText("Goal: " + user.getGoal());
+        goalLabel.setText("Goal: " + user.getGoal().name());
         unitPreferenceLabel.setText("Display Units: " + user.getUnitPreference());
+    }
+
+    public void addEditListener(ActionListener listener) {
+        editButton.addActionListener(listener);
     }
 
     public void addBackListener(ActionListener listener) {

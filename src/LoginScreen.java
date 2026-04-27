@@ -16,62 +16,30 @@ public class LoginScreen extends JFrame {
 
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBackground(SolumBaseGUI.BACKGROUND);
-        panel.setBorder(BorderFactory.createEmptyBorder(25, 40, 25, 40));
+        panel.setBorder(BorderFactory.createEmptyBorder(30, 45, 30, 45));
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10); // default spacing
         gbc.fill = GridBagConstraints.HORIZONTAL;
-
-        // ===== TITLE =====
         gbc.gridx = 0;
-        gbc.gridy = 0;
         gbc.gridwidth = 2;
 
         JLabel titleLabel = new JLabel("SOLUM", SwingConstants.CENTER);
         titleLabel.setFont(SolumBaseGUI.TITLE_FONT);
         titleLabel.setForeground(SolumBaseGUI.PURPLE);
-        panel.add(titleLabel, gbc);
-
-        // ===== SUBTITLE (NEW) =====
-        gbc.gridy++;
-        gbc.insets = new Insets(5, 10, 15, 10); // 🔥 spacing tweak here
 
         JLabel subtitle = new JLabel("WELCOME FITNESS ENTHUSIAST", SwingConstants.CENTER);
-        subtitle.setFont(SolumBaseGUI.TEXT_FONT.deriveFont(12f));
+        subtitle.setFont(SolumBaseGUI.BUTTON_FONT.deriveFont(Font.BOLD, 14f));
         subtitle.setForeground(SolumBaseGUI.PURPLE);
-        panel.add(subtitle, gbc);
 
-        // Reset spacing for rest
-        gbc.insets = new Insets(10, 10, 10, 10);
+        usernameField = new JTextField(20);
+        passwordField = new JPasswordField(20);
 
-        // ===== USERNAME =====
-        gbc.gridy++;
-        gbc.gridwidth = 1;
-        gbc.gridx = 0;
+        usernameField.setFont(SolumBaseGUI.TEXT_FONT);
+        passwordField.setFont(SolumBaseGUI.TEXT_FONT);
 
-        JLabel usernameLabel = new JLabel("Username:");
-        usernameLabel.setFont(SolumBaseGUI.TEXT_FONT);
-        usernameLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-        panel.add(usernameLabel, gbc);
+        JLabel usernameLabel = createCenteredLabel("Username");
+        JLabel passwordLabel = createCenteredLabel("Password");
 
-        gbc.gridx = 1;
-        usernameField = new JTextField(18);
-        panel.add(usernameField, gbc);
-
-        // ===== PASSWORD =====
-        gbc.gridy++;
-        gbc.gridx = 0;
-
-        JLabel passwordLabel = new JLabel("Password:");
-        passwordLabel.setFont(SolumBaseGUI.TEXT_FONT);
-        passwordLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-        panel.add(passwordLabel, gbc);
-
-        gbc.gridx = 1;
-        passwordField = new JPasswordField(18);
-        panel.add(passwordField, gbc);
-
-        // ===== BUTTONS =====
         loginButton = new JButton("Log In");
         registerButton = new JButton("Register Account");
         closeButton = new JButton("Close App");
@@ -80,24 +48,66 @@ public class LoginScreen extends JFrame {
         styleButton(registerButton);
         styleButton(closeButton);
 
+        // Title
+        gbc.gridy = 0;
+        gbc.insets = new Insets(5, 10, 0, 10);
+        panel.add(titleLabel, gbc);
+
+        // Subtitle
         gbc.gridy++;
+        gbc.insets = new Insets(5, 10, 25, 10);
+        panel.add(subtitle, gbc);
+
+        // Username label
+        gbc.gridy++;
+        gbc.insets = new Insets(5, 10, 3, 10);
+        panel.add(usernameLabel, gbc);
+
+        // Username field
+        gbc.gridy++;
+        gbc.insets = new Insets(0, 80, 12, 80);
+        panel.add(usernameField, gbc);
+
+        // Password label
+        gbc.gridy++;
+        gbc.insets = new Insets(5, 10, 3, 10);
+        panel.add(passwordLabel, gbc);
+
+        // Password field
+        gbc.gridy++;
+        gbc.insets = new Insets(0, 80, 18, 80);
+        panel.add(passwordField, gbc);
+
+        // Buttons row
+        gbc.gridy++;
+        gbc.gridwidth = 1;
+        gbc.insets = new Insets(8, 10, 8, 10);
+
         gbc.gridx = 0;
         panel.add(loginButton, gbc);
 
         gbc.gridx = 1;
         panel.add(registerButton, gbc);
 
-        // ===== CLOSE BUTTON CENTERED =====
+        // Close button
         gbc.gridy++;
         gbc.gridx = 0;
         gbc.gridwidth = 2;
+        gbc.insets = new Insets(8, 10, 8, 10);
         panel.add(closeButton, gbc);
 
         add(panel);
 
         pack();
-        setMinimumSize(new Dimension(520, 330));
+        setMinimumSize(new Dimension(580, 430));
         setLocationRelativeTo(null);
+    }
+
+    private JLabel createCenteredLabel(String text) {
+        JLabel label = new JLabel(text, SwingConstants.CENTER);
+        label.setFont(SolumBaseGUI.TEXT_FONT);
+        label.setForeground(SolumBaseGUI.BLACK);
+        return label;
     }
 
     private void styleButton(JButton button) {
