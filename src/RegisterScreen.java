@@ -13,8 +13,6 @@ public class RegisterScreen extends JFrame {
     private JButton registerButton;
     private JButton backButton;
 
-    private JComboBox<UserProfile.UnitPreference> unitPreferenceBox;
-
     public RegisterScreen() {
 
         setTitle("Register Account");
@@ -30,9 +28,6 @@ public class RegisterScreen extends JFrame {
         JLabel heightLabel = new JLabel("Height (in):");
         JLabel weightLabel = new JLabel("Weight (lbs):");
         JLabel goalLabel = new JLabel("Goal:");
-        JLabel unitLabel = new JLabel("Units:");
-
-
 
         usernameField = new JTextField();
         passwordField = new JPasswordField();
@@ -45,8 +40,6 @@ public class RegisterScreen extends JFrame {
                 "MAINTENANCE"
         });
 
-        unitPreferenceBox = new JComboBox<>(UserProfile.UnitPreference.values());
-        unitPreferenceBox.setSelectedItem(UserProfile.UnitPreference.IMPERIAL);
 
         registerButton = new JButton("Create Account");
         backButton = new JButton("Back to Login");
@@ -65,9 +58,6 @@ public class RegisterScreen extends JFrame {
 
         panel.add(goalLabel);
         panel.add(goalBox);
-
-        panel.add(unitLabel);
-        panel.add(unitPreferenceBox);
 
         panel.add(registerButton);
         panel.add(backButton);
@@ -95,11 +85,6 @@ public class RegisterScreen extends JFrame {
 
     public String getGoal() {
         return (String) goalBox.getSelectedItem();
-    }
-
-    public UserProfile.UnitPreference getUnitPreference() 
-    {
-        return (UserProfile.UnitPreference) unitPreferenceBox.getSelectedItem();
     }
 
     // Listeners

@@ -39,7 +39,7 @@ public class DashboardController {
     private class ProfileListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            ProfileScreen profileScreen = new ProfileScreen();
+            ProfileScreen profileScreen = new ProfileScreen(accountManager);
             new ProfileController(profileScreen, dashboardView, currentUser, accountManager);
 
             profileScreen.setVisible(true);

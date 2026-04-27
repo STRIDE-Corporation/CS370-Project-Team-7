@@ -102,6 +102,23 @@ public class AccountManager {
         }
     }
 
+    public boolean updateUnitPreference(int userId, UserProfile.UnitPreference unitPreference) {
+        String sql = "UPDATE users SET unit_preference = ? WHERE user_id = ?";
+
+        try (Connection conn = db.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, unitPreference.name());
+            pstmt.setInt(2, userId);
+
+            return pstmt.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public void displayAllUsers() {
         String sql = "SELECT * FROM users";
 

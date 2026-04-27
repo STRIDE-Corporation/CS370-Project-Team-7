@@ -25,7 +25,7 @@ public class RegisterController {
             String heightStr = registerView.getHeightInput();
             String weightStr = registerView.getWeightInput();
             String goalStr = registerView.getGoal();
-            UserProfile.UnitPreference unitPreference = registerView.getUnitPreference();
+            UserProfile.UnitPreference unitPreference = UserProfile.UnitPreference.IMPERIAL;
 
             if (username.isEmpty() || password.isEmpty() ||
                     heightStr.isEmpty() || weightStr.isEmpty()) {
