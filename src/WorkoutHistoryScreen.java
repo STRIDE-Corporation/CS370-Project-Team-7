@@ -16,7 +16,6 @@ public class WorkoutHistoryScreen extends JFrame {
         setLayout(new BorderLayout(10, 10));
         getContentPane().setBackground(SolumBaseGUI.BACKGROUND);
 
-        // ===== TEXT AREA =====
         historyArea = new JTextArea();
         historyArea.setEditable(false);
         historyArea.setLineWrap(true);
@@ -33,7 +32,6 @@ public class WorkoutHistoryScreen extends JFrame {
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
-        // ===== BUTTON PANEL =====
         JPanel bottomPanel = new JPanel(new FlowLayout());
         bottomPanel.setBackground(SolumBaseGUI.BACKGROUND);
         bottomPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 20, 10));
@@ -47,7 +45,6 @@ public class WorkoutHistoryScreen extends JFrame {
         bottomPanel.add(deleteButton);
         bottomPanel.add(backButton);
 
-        // ===== ADD COMPONENTS =====
         add(scrollPane, BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
     }

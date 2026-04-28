@@ -28,7 +28,7 @@ public class EditProfileScreen extends JFrame {
         panel.add(new JLabel("Height (in):"));
         heightField = new JTextField();
         panel.add(heightField);
-        
+
         panel.add(new JLabel("Weight (lbs):"));
         weightField = new JTextField();
         panel.add(weightField);

@@ -8,18 +8,20 @@ public class Workout {
     private String username;
     private LocalDateTime workoutDateTime;
     private int duration;
+    private int caloriesBurned;
     private List<ExerciseEntry> exercises;
 
-    public Workout(int workoutId, String username, int duration) {
+    public Workout(int workoutId, String username, int duration, int caloriesBurned) {
         this.workoutId = workoutId;
         this.username = username;
         this.duration = duration;
+        this.caloriesBurned = caloriesBurned;
         this.workoutDateTime = LocalDateTime.now();
         this.exercises = new ArrayList<>();
     }
 
-    public static Workout createWorkout(int workoutId, String username, int duration) {
-        return new Workout(workoutId, username, duration);
+    public static Workout createWorkout(int workoutId, String username, int duration, int caloriesBurned) {
+        return new Workout(workoutId, username, duration, caloriesBurned);
     }
 
     public void addExercise(ExerciseEntry exercise) {

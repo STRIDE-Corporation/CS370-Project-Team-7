@@ -4,37 +4,16 @@ public class ExerciseEntry {
     private String exerciseName;
     private int sets;
     private int reps;
-    private double weight;
-    private int restTimeSeconds;
-    private String muscleGroup;
-    private double distance;
-    private String paceSpeed;
-    private String inclineResistance;
-    private String exerciseNotes;
+    private int duration;
+    private int caloriesBurned;
 
-    public ExerciseEntry(int exerciseEntryId,
-                         String exerciseName,
-                         int sets,
-                         int reps,
-                         double weight,
-                         int restTimeSeconds,
-                         String muscleGroup,
-                         double distance,
-                         String paceSpeed,
-                         String inclineResistance,
-                         String exerciseNotes) {
-
+    public ExerciseEntry(int exerciseEntryId, String exerciseName, int sets, int reps, int duration, int caloriesBurned) {
         this.exerciseEntryId = exerciseEntryId;
         this.exerciseName = exerciseName;
         this.sets = sets;
         this.reps = reps;
-        this.weight = weight;
-        this.restTimeSeconds = restTimeSeconds;
-        this.muscleGroup = muscleGroup;
-        this.distance = distance;
-        this.paceSpeed = paceSpeed;
-        this.inclineResistance = inclineResistance;
-        this.exerciseNotes = exerciseNotes;
+        this.duration = duration;
+        this.caloriesBurned = caloriesBurned;
     }
 
     public int getExerciseEntryId() {
@@ -53,49 +32,35 @@ public class ExerciseEntry {
         return reps;
     }
 
-    public double getWeight() {
-        return weight;
+    public int getDuration() {
+        return duration;
     }
 
-    public int getRestTimeSeconds() {
-        return restTimeSeconds;
+    public int getCaloriesBurned() {
+        return caloriesBurned;
     }
 
-    public String getMuscleGroup() {
-        return muscleGroup;
+    public void setExerciseName(String exerciseName) {
+        this.exerciseName = exerciseName;
     }
 
-    public double getDistance() {
-        return distance;
+    public void setSets(int sets) {
+        this.sets = sets;
     }
 
-    public String getPaceSpeed() {
-        return paceSpeed;
+    public void setReps(int reps) {
+        this.reps = reps;
     }
 
-    public String getInclineResistance() {
-        return inclineResistance;
+    public void setDuration(int duration) {
+        this.duration = duration;
     }
 
-    public String getExerciseNotes() {
-        return exerciseNotes;
-    }
-
-    // ✅ FIXED: This is what your Workout.java was calling
     public void viewExercise() {
         System.out.println("Exercise ID: " + exerciseEntryId);
         System.out.println("Exercise Name: " + exerciseName);
         System.out.println("Sets: " + sets);
         System.out.println("Reps: " + reps);
-        System.out.println("Weight: " + weight);
-        System.out.println("Rest Time: " + restTimeSeconds + " sec");
-        System.out.println("Muscle Group: " + muscleGroup);
-        System.out.println("Distance: " + distance);
-        System.out.println("Pace/Speed: " + paceSpeed);
-        System.out.println("Incline/Resistance: " + inclineResistance);
-
-        if (exerciseNotes != null && !exerciseNotes.isEmpty()) {
-            System.out.println("Notes: " + exerciseNotes);
-        }
+        System.out.println("Duration: " + duration + " minutes");
     }
 }
