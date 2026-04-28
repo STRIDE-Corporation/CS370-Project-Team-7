@@ -19,8 +19,7 @@ public class DatabaseHandler {
                 password TEXT NOT NULL,
                 height INTEGER NOT NULL,
                 weight INTEGER NOT NULL,
-                goal TEXT NOT NULL,
-                unit_preference TEXT NOT NULL DEFAULT 'IMPERIAL'
+                goal TEXT NOT NULL
             );
             """;
 
@@ -51,6 +50,18 @@ public class DatabaseHandler {
             stmt.execute(usersTable);
             stmt.execute(workoutsTable);
             stmt.execute(exercisesTable);
+
+            // Migration: add unit_preference to older databases
+            try {
+                stmt.execute("""
+                    ALTER TABLE users
+                    ADD COLUMN unit_preference TEXT NOT NULL DEFAULT 'IMPERIAL';
+                    """);
+                System.out.println("unit_preference column added.");
+            } catch (SQLException e) {
+                // If the column already exists, SQLite throws an error.
+                // That is okay, so we ignore it.
+            }
 
             System.out.println("Database initialized.");
 

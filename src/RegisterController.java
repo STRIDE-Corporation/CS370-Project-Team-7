@@ -19,16 +19,13 @@ public class RegisterController {
     private class RegisterListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-
             String username = registerView.getUsername();
             String password = registerView.getPassword();
             String heightStr = registerView.getHeightInput();
             String weightStr = registerView.getWeightInput();
             String goalStr = registerView.getGoal();
-            UserProfile.UnitPreference unitPreference = UserProfile.UnitPreference.IMPERIAL;
 
-            if (username.isEmpty() || password.isEmpty() ||
-                    heightStr.isEmpty() || weightStr.isEmpty()) {
+            if (username.isEmpty() || password.isEmpty() || heightStr.isEmpty() || weightStr.isEmpty()) {
                 registerView.displayErrorMessage("All fields must be filled.");
                 return;
             }
@@ -38,7 +35,8 @@ public class RegisterController {
                 return;
             }
 
-            int height, weight;
+            int height;
+            int weight;
 
             try {
                 height = Integer.parseInt(heightStr);
@@ -54,9 +52,15 @@ public class RegisterController {
             }
 
             UserProfile.Goal goal = UserProfile.Goal.valueOf(goalStr);
+            UserProfile.UnitPreference unitPreference = UserProfile.UnitPreference.IMPERIAL;
 
             UserProfile user = accountManager.createAccount(
-                    username, password, height, weight, goal, unitPreference
+                    username,
+                    password,
+                    height,
+                    weight,
+                    goal,
+                    unitPreference
             );
 
             if (user != null) {
@@ -64,7 +68,7 @@ public class RegisterController {
                 registerView.dispose();
                 loginView.setVisible(true);
             } else {
-                registerView.displayErrorMessage("Account creation failed.");
+                registerView.displayErrorMessage("Account creation failed. Check database schema.");
             }
         }
     }
