@@ -29,8 +29,8 @@ public class DatabaseHandler {
                 workout_id INTEGER PRIMARY KEY AUTOINCREMENT,
                 username TEXT NOT NULL,
                 workout_datetime TEXT NOT NULL,
-                duration INTEGER NOT NULL
-                calories_burned INTEGER NOT NULL DEFAULT 0                                
+                duration INTEGER NOT NULL,
+                calories_burned INTEGER NOT NULL DEFAULT 0
             );
             """;
 
@@ -42,8 +42,8 @@ public class DatabaseHandler {
                 sets INTEGER NOT NULL,
                 reps INTEGER NOT NULL,
                 duration INTEGER NOT NULL,
+                calories_burned INTEGER NOT NULL,
                 FOREIGN KEY (workout_id) REFERENCES workouts(workout_id)
-                calories_burned INTEGER NOT NULL
             );
             """;
 

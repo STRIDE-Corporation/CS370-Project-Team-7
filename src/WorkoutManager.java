@@ -1,5 +1,6 @@
 import java.sql.*;
 import java.time.LocalDateTime;
+import org.jfree.data.category.DefaultCategoryDataset;
 
 public class WorkoutManager {
 
@@ -178,6 +179,40 @@ public class WorkoutManager {
         }
 
         return history.toString();
+    }
+
+    public DefaultCategoryDataset getUserCaloriesDataset(String username) {
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+
+        String sql = """
+        SELECT workout_id, workout_datetime, calories_burned
+        FROM workouts
+        WHERE username = ?
+        ORDER BY workout_datetime ASC
+        """;
+
+        try (Connection conn = db.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, username);
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                int workoutId = rs.getInt("workout_id");
+                int caloriesBurned = rs.getInt("calories_burned");
+
+                dataset.addValue(
+                        caloriesBurned,
+                        "Calories Burned",
+                        "Workout " + workoutId
+                );
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return dataset;
     }
 
     public boolean deleteWorkout(int workoutId, String username) {

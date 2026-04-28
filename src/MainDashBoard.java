@@ -8,6 +8,7 @@ public class MainDashBoard extends JFrame {
     private JButton viewHistoryButton;
     private JButton profileButton;
     private JButton logoutButton;
+    private JButton statsButton;
 
     public MainDashBoard(String username) {
         setTitle("Solum - Dashboard");
@@ -35,6 +36,8 @@ public class MainDashBoard extends JFrame {
         logWorkoutButton = new JButton("Log Workout");
         viewHistoryButton = new JButton("Workout History");
         profileButton = new JButton("Account and Profile");
+        statsButton = new JButton("View Stats");
+        styleDashboardButton(statsButton);
 
         styleDashboardButton(logWorkoutButton);
         styleDashboardButton(viewHistoryButton);
@@ -43,6 +46,7 @@ public class MainDashBoard extends JFrame {
         menuPanel.add(logWorkoutButton);
         menuPanel.add(viewHistoryButton);
         menuPanel.add(profileButton);
+        menuPanel.add(statsButton);
 
         add(menuPanel, BorderLayout.CENTER);
 
@@ -91,6 +95,8 @@ public class MainDashBoard extends JFrame {
     public void addProfileListener(ActionListener listener) {
         profileButton.addActionListener(listener);
     }
+
+    public void addStatsListener(ActionListener listener) { statsButton.addActionListener(listener); }
 
     public void addLogoutListener(ActionListener listener) {
         logoutButton.addActionListener(listener);
