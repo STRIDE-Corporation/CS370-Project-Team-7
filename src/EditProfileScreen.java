@@ -13,7 +13,7 @@ public class EditProfileScreen extends JFrame {
     private JButton cancelButton;
 
     public EditProfileScreen() {
-        setTitle("Solum - Edit Profile");
+        setTitle("Solum - Edit Account and Profile");
         setSize(400, 300);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);

@@ -14,35 +14,47 @@ public class RegisterScreen extends JFrame {
     private JButton backButton;
 
     public RegisterScreen() {
-
         setTitle("Register Account");
-        setSize(450, 350);
+        setSize(560, 430);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
+        getContentPane().setBackground(SolumBaseGUI.BACKGROUND);
 
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(7, 2, 10, 10));
+        JPanel panel = new JPanel(new GridLayout(7, 2, 12, 12));
+        panel.setBackground(SolumBaseGUI.BACKGROUND);
+        panel.setBorder(BorderFactory.createEmptyBorder(25, 35, 25, 35));
 
-        JLabel usernameLabel = new JLabel("Username:");
-        JLabel passwordLabel = new JLabel("Password:");
-        JLabel heightLabel = new JLabel("Height (in):");
-        JLabel weightLabel = new JLabel("Weight (lbs):");
-        JLabel goalLabel = new JLabel("Goal:");
+        JLabel usernameLabel = createLabel("Username:");
+        JLabel passwordLabel = createLabel("Password:");
+        JLabel heightLabel = createLabel("Height (in):");
+        JLabel weightLabel = createLabel("Weight (lbs):");
+        JLabel goalLabel = createLabel("Goal:");
 
         usernameField = new JTextField();
         passwordField = new JPasswordField();
         heightField = new JTextField();
         weightField = new JTextField();
 
+        styleInputField(usernameField);
+        styleInputField(passwordField);
+        styleInputField(heightField);
+        styleInputField(weightField);
+
         goalBox = new JComboBox<>(new String[]{
                 "WEIGHT_LOSS",
                 "MUSCLE_GAIN",
                 "MAINTENANCE"
         });
-
+        goalBox.setFont(SolumBaseGUI.TEXT_FONT);
+        goalBox.setBackground(SolumBaseGUI.FIELD_BACKGROUND);
+        goalBox.setForeground(SolumBaseGUI.WHITE);
+        goalBox.setBorder(BorderFactory.createLineBorder(SolumBaseGUI.NEON_PURPLE, 1));
 
         registerButton = new JButton("Create Account");
         backButton = new JButton("Back to Login");
+
+        styleButton(registerButton);
+        styleButton(backButton);
 
         panel.add(usernameLabel);
         panel.add(usernameField);
@@ -65,7 +77,40 @@ public class RegisterScreen extends JFrame {
         add(panel);
     }
 
-    // Getters
+    private JLabel createLabel(String text) {
+        JLabel label = new JLabel(text);
+        label.setFont(SolumBaseGUI.TEXT_FONT);
+        label.setForeground(SolumBaseGUI.NEON_PURPLE);
+        return label;
+    }
+
+    private void styleInputField(JTextField field) {
+        field.setFont(SolumBaseGUI.TEXT_FONT);
+        field.setBackground(SolumBaseGUI.FIELD_BACKGROUND);
+        field.setForeground(SolumBaseGUI.WHITE);
+        field.setCaretColor(SolumBaseGUI.WHITE);
+        field.setBorder(BorderFactory.createLineBorder(SolumBaseGUI.NEON_PURPLE, 1));
+    }
+
+    private void styleButton(JButton button) {
+        button.setFont(SolumBaseGUI.BUTTON_FONT);
+        button.setBackground(SolumBaseGUI.BUTTON_BACKGROUND);
+        button.setForeground(SolumBaseGUI.NEON_PURPLE);
+        button.setFocusPainted(false);
+        button.setBorder(BorderFactory.createLineBorder(SolumBaseGUI.NEON_PURPLE, 2));
+
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(SolumBaseGUI.BUTTON_HOVER);
+                button.setBorder(BorderFactory.createLineBorder(SolumBaseGUI.GLOW_STRONG, 3));
+            }
+
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(SolumBaseGUI.BUTTON_BACKGROUND);
+                button.setBorder(BorderFactory.createLineBorder(SolumBaseGUI.NEON_PURPLE, 2));
+            }
+        });
+    }
 
     public String getUsername() {
         return usernameField.getText().trim();
@@ -87,8 +132,6 @@ public class RegisterScreen extends JFrame {
         return (String) goalBox.getSelectedItem();
     }
 
-    // Listeners
-
     public void addRegisterListener(ActionListener listener) {
         registerButton.addActionListener(listener);
     }
@@ -96,8 +139,6 @@ public class RegisterScreen extends JFrame {
     public void addBackListener(ActionListener listener) {
         backButton.addActionListener(listener);
     }
-
-    // Messages
 
     public void displayMessage(String message) {
         JOptionPane.showMessageDialog(this, message);

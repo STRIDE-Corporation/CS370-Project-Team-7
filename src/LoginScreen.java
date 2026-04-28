@@ -16,7 +16,7 @@ public class LoginScreen extends JFrame {
 
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBackground(SolumBaseGUI.BACKGROUND);
-        panel.setBorder(BorderFactory.createEmptyBorder(30, 45, 30, 45));
+        panel.setBorder(BorderFactory.createEmptyBorder(60, 60, 60, 60));
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -25,17 +25,17 @@ public class LoginScreen extends JFrame {
 
         JLabel titleLabel = new JLabel("SOLUM", SwingConstants.CENTER);
         titleLabel.setFont(SolumBaseGUI.TITLE_FONT);
-        titleLabel.setForeground(SolumBaseGUI.PURPLE);
+        titleLabel.setForeground(SolumBaseGUI.NEON_PURPLE);
 
         JLabel subtitle = new JLabel("WELCOME FITNESS ENTHUSIAST", SwingConstants.CENTER);
         subtitle.setFont(SolumBaseGUI.BUTTON_FONT.deriveFont(Font.BOLD, 14f));
-        subtitle.setForeground(SolumBaseGUI.PURPLE);
+        subtitle.setForeground(SolumBaseGUI.NEON_PURPLE);
 
         usernameField = new JTextField(20);
         passwordField = new JPasswordField(20);
 
-        usernameField.setFont(SolumBaseGUI.TEXT_FONT);
-        passwordField.setFont(SolumBaseGUI.TEXT_FONT);
+        styleInputField(usernameField);
+        styleInputField(passwordField);
 
         JLabel usernameLabel = createCenteredLabel("Username");
         JLabel passwordLabel = createCenteredLabel("Password");
@@ -48,40 +48,35 @@ public class LoginScreen extends JFrame {
         styleButton(registerButton);
         styleButton(closeButton);
 
-        // Title
+        // Layout
+
         gbc.gridy = 0;
         gbc.insets = new Insets(5, 10, 0, 10);
         panel.add(titleLabel, gbc);
 
-        // Subtitle
         gbc.gridy++;
-        gbc.insets = new Insets(5, 10, 25, 10);
+        gbc.insets = new Insets(5, 10, 30, 10);
         panel.add(subtitle, gbc);
 
-        // Username label
         gbc.gridy++;
-        gbc.insets = new Insets(5, 10, 3, 10);
+        gbc.insets = new Insets(5, 10, 5, 10);
         panel.add(usernameLabel, gbc);
 
-        // Username field
         gbc.gridy++;
-        gbc.insets = new Insets(0, 80, 12, 80);
+        gbc.insets = new Insets(0, 120, 15, 120);
         panel.add(usernameField, gbc);
 
-        // Password label
         gbc.gridy++;
-        gbc.insets = new Insets(5, 10, 3, 10);
+        gbc.insets = new Insets(5, 10, 5, 10);
         panel.add(passwordLabel, gbc);
 
-        // Password field
         gbc.gridy++;
-        gbc.insets = new Insets(0, 80, 18, 80);
+        gbc.insets = new Insets(0, 120, 25, 120);
         panel.add(passwordField, gbc);
 
-        // Buttons row
         gbc.gridy++;
         gbc.gridwidth = 1;
-        gbc.insets = new Insets(8, 10, 8, 10);
+        gbc.insets = new Insets(10, 10, 10, 10);
 
         gbc.gridx = 0;
         panel.add(loginButton, gbc);
@@ -89,34 +84,55 @@ public class LoginScreen extends JFrame {
         gbc.gridx = 1;
         panel.add(registerButton, gbc);
 
-        // Close button
         gbc.gridy++;
         gbc.gridx = 0;
         gbc.gridwidth = 2;
-        gbc.insets = new Insets(8, 10, 8, 10);
+        gbc.insets = new Insets(10, 10, 10, 10);
         panel.add(closeButton, gbc);
 
         add(panel);
 
-        pack();
-        setMinimumSize(new Dimension(580, 430));
-        setLocationRelativeTo(null);
+        // 🔥 THIS is the key (bigger + consistent across app)
+        SolumBaseGUI.styleFrame(this);
     }
 
     private JLabel createCenteredLabel(String text) {
         JLabel label = new JLabel(text, SwingConstants.CENTER);
         label.setFont(SolumBaseGUI.TEXT_FONT);
-        label.setForeground(SolumBaseGUI.BLACK);
+        label.setForeground(SolumBaseGUI.NEON_PURPLE);
         return label;
+    }
+
+    private void styleInputField(JTextField field) {
+        field.setFont(SolumBaseGUI.TEXT_FONT);
+        field.setBackground(SolumBaseGUI.FIELD_BACKGROUND);
+        field.setForeground(SolumBaseGUI.WHITE);
+        field.setCaretColor(SolumBaseGUI.WHITE);
+        field.setBorder(BorderFactory.createLineBorder(SolumBaseGUI.NEON_PURPLE, 1));
     }
 
     private void styleButton(JButton button) {
         button.setFont(SolumBaseGUI.BUTTON_FONT);
-        button.setBackground(SolumBaseGUI.WHITE);
-        button.setForeground(SolumBaseGUI.BLACK);
+        button.setBackground(SolumBaseGUI.BUTTON_BACKGROUND);
+        button.setForeground(SolumBaseGUI.NEON_PURPLE);
         button.setFocusPainted(false);
-        button.setPreferredSize(new Dimension(200, 45));
+        button.setBorder(BorderFactory.createLineBorder(SolumBaseGUI.NEON_PURPLE, 2));
+        button.setPreferredSize(new Dimension(220, 50));
+
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(SolumBaseGUI.BUTTON_HOVER);
+                button.setBorder(BorderFactory.createLineBorder(SolumBaseGUI.GLOW_STRONG, 3));
+            }
+
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(SolumBaseGUI.BUTTON_BACKGROUND);
+                button.setBorder(BorderFactory.createLineBorder(SolumBaseGUI.NEON_PURPLE, 2));
+            }
+        });
     }
+
+    // Getters
 
     public String getUsername() {
         return usernameField.getText();
@@ -125,6 +141,8 @@ public class LoginScreen extends JFrame {
     public String getPassword() {
         return new String(passwordField.getPassword());
     }
+
+    // Listeners
 
     public void addLoginListener(ActionListener listener) {
         loginButton.addActionListener(listener);

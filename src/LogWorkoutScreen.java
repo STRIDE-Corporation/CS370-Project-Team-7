@@ -17,48 +17,105 @@ public class LogWorkoutScreen extends JFrame {
 
     public LogWorkoutScreen() {
         setTitle("Log Workout");
-        setSize(500, 450);
+        setSize(650, 500);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
+        setLayout(new BorderLayout(10, 10));
+        getContentPane().setBackground(SolumBaseGUI.BACKGROUND);
 
-        JPanel inputPanel = new JPanel(new GridLayout(5, 2, 10, 10));
+        JPanel inputPanel = new JPanel(new GridLayout(5, 2, 12, 12));
+        inputPanel.setBackground(SolumBaseGUI.BACKGROUND);
+        inputPanel.setBorder(BorderFactory.createEmptyBorder(25, 35, 15, 35));
 
-        inputPanel.add(new JLabel("Exercise Duration (minutes):"));
         durationField = new JTextField();
+        exerciseNameField = new JTextField();
+        setsField = new JTextField();
+        repsField = new JTextField();
+
+        styleInputField(durationField);
+        styleInputField(exerciseNameField);
+        styleInputField(setsField);
+        styleInputField(repsField);
+
+        inputPanel.add(createLabel("Duration (min):"));
         inputPanel.add(durationField);
 
-        inputPanel.add(new JLabel("Exercise Name:"));
-        exerciseNameField = new JTextField();
+        inputPanel.add(createLabel("Exercise Name:"));
         inputPanel.add(exerciseNameField);
 
-        inputPanel.add(new JLabel("Sets:"));
-        setsField = new JTextField();
+        inputPanel.add(createLabel("Sets:"));
         inputPanel.add(setsField);
 
-        inputPanel.add(new JLabel("Reps:"));
-        repsField = new JTextField();
+        inputPanel.add(createLabel("Reps:"));
         inputPanel.add(repsField);
 
         addExerciseButton = new JButton("Add Exercise");
         finishWorkoutButton = new JButton("Finish Workout");
         backButton = new JButton("Back");
 
+        styleButton(addExerciseButton);
+        styleButton(finishWorkoutButton);
+        styleButton(backButton);
+
         inputPanel.add(addExerciseButton);
         inputPanel.add(finishWorkoutButton);
 
         exerciseListArea = new JTextArea();
         exerciseListArea.setEditable(false);
+        exerciseListArea.setFont(SolumBaseGUI.TEXT_FONT);
+        exerciseListArea.setBackground(SolumBaseGUI.FIELD_BACKGROUND);
+        exerciseListArea.setForeground(SolumBaseGUI.WHITE);
+        exerciseListArea.setCaretColor(SolumBaseGUI.WHITE);
+        exerciseListArea.setBorder(BorderFactory.createLineBorder(SolumBaseGUI.NEON_PURPLE, 1));
 
         JScrollPane scrollPane = new JScrollPane(exerciseListArea);
+        scrollPane.setBorder(BorderFactory.createLineBorder(SolumBaseGUI.NEON_PURPLE, 2));
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
         JPanel bottomPanel = new JPanel();
+        bottomPanel.setBackground(SolumBaseGUI.BACKGROUND);
+        bottomPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
         bottomPanel.add(backButton);
 
-        setLayout(new BorderLayout(10, 10));
         add(inputPanel, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
+    }
+
+    private JLabel createLabel(String text) {
+        JLabel label = new JLabel(text);
+        label.setFont(SolumBaseGUI.TEXT_FONT);
+        label.setForeground(SolumBaseGUI.NEON_PURPLE);
+        return label;
+    }
+
+    private void styleInputField(JTextField field) {
+        field.setFont(SolumBaseGUI.TEXT_FONT);
+        field.setBackground(SolumBaseGUI.FIELD_BACKGROUND);
+        field.setForeground(SolumBaseGUI.WHITE);
+        field.setCaretColor(SolumBaseGUI.WHITE);
+        field.setBorder(BorderFactory.createLineBorder(SolumBaseGUI.NEON_PURPLE, 1));
+    }
+
+    private void styleButton(JButton button) {
+        button.setFont(SolumBaseGUI.BUTTON_FONT);
+        button.setBackground(SolumBaseGUI.BUTTON_BACKGROUND);
+        button.setForeground(SolumBaseGUI.NEON_PURPLE);
+        button.setFocusPainted(false);
+        button.setBorder(BorderFactory.createLineBorder(SolumBaseGUI.NEON_PURPLE, 2));
+        button.setPreferredSize(new Dimension(210, 45));
+
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(SolumBaseGUI.BUTTON_HOVER);
+                button.setBorder(BorderFactory.createLineBorder(SolumBaseGUI.GLOW_STRONG, 3));
+            }
+
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(SolumBaseGUI.BUTTON_BACKGROUND);
+                button.setBorder(BorderFactory.createLineBorder(SolumBaseGUI.NEON_PURPLE, 2));
+            }
+        });
     }
 
     public String getDuration() {

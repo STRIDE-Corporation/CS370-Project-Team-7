@@ -22,33 +22,39 @@ public class ProfileScreen extends JFrame {
     public ProfileScreen(AccountManager accountManager) {
         this.accountManager = accountManager;
 
-        setTitle("Profile");
-        setSize(450, 400);
+        setTitle("Account and Profile");
+        setSize(500, 450);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
+        getContentPane().setBackground(SolumBaseGUI.BACKGROUND);
 
         JPanel panel = new JPanel(new GridLayout(8, 1, 10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        panel.setBackground(SolumBaseGUI.BACKGROUND);
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 25, 20, 25));
 
-        usernameLabel = new JLabel();
-        heightLabel = new JLabel();
-        weightLabel = new JLabel();
-        goalLabel = new JLabel();
-        unitPreferenceLabel = new JLabel();
+        usernameLabel = createProfileLabel();
+        heightLabel = createProfileLabel();
+        weightLabel = createProfileLabel();
+        goalLabel = createProfileLabel();
+        unitPreferenceLabel = createProfileLabel();
 
-        imperialButton = new JRadioButton("Imperial");
-        metricButton = new JRadioButton("Metric");
+        imperialButton = createRadioButton("Imperial");
+        metricButton = createRadioButton("Metric");
 
         ButtonGroup unitGroup = new ButtonGroup();
         unitGroup.add(imperialButton);
         unitGroup.add(metricButton);
 
         JPanel unitPanel = new JPanel();
+        unitPanel.setBackground(SolumBaseGUI.BACKGROUND);
         unitPanel.add(imperialButton);
         unitPanel.add(metricButton);
 
         editButton = new JButton("Edit Profile");
         backButton = new JButton("Back");
+
+        styleButton(editButton);
+        styleButton(backButton);
 
         panel.add(usernameLabel);
         panel.add(heightLabel);
@@ -63,6 +69,42 @@ public class ProfileScreen extends JFrame {
 
         imperialButton.addActionListener(e -> saveUnitPreference(UserProfile.UnitPreference.IMPERIAL));
         metricButton.addActionListener(e -> saveUnitPreference(UserProfile.UnitPreference.METRIC));
+    }
+
+    private JLabel createProfileLabel() {
+        JLabel label = new JLabel("", SwingConstants.CENTER);
+        label.setFont(SolumBaseGUI.TEXT_FONT);
+        label.setForeground(SolumBaseGUI.NEON_PURPLE);
+        return label;
+    }
+
+    private JRadioButton createRadioButton(String text) {
+        JRadioButton button = new JRadioButton(text);
+        button.setFont(SolumBaseGUI.BUTTON_FONT);
+        button.setForeground(SolumBaseGUI.NEON_PURPLE);
+        button.setBackground(SolumBaseGUI.BACKGROUND);
+        button.setFocusPainted(false);
+        return button;
+    }
+
+    private void styleButton(JButton button) {
+        button.setFont(SolumBaseGUI.BUTTON_FONT);
+        button.setBackground(SolumBaseGUI.BUTTON_BACKGROUND);
+        button.setForeground(SolumBaseGUI.NEON_PURPLE);
+        button.setFocusPainted(false);
+        button.setBorder(BorderFactory.createLineBorder(SolumBaseGUI.NEON_PURPLE, 2));
+
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(SolumBaseGUI.BUTTON_HOVER);
+                button.setBorder(BorderFactory.createLineBorder(SolumBaseGUI.GLOW_STRONG, 3));
+            }
+
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(SolumBaseGUI.BUTTON_BACKGROUND);
+                button.setBorder(BorderFactory.createLineBorder(SolumBaseGUI.NEON_PURPLE, 2));
+            }
+        });
     }
 
     public void setProfileData(UserProfile user) {
