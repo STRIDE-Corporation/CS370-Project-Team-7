@@ -15,45 +15,36 @@ public class EditProfileScreen extends JFrame {
     public EditProfileScreen() {
         setTitle("Solum - Edit Account and Profile");
 
-        // 🔥 FULL SCREEN
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setMinimumSize(new Dimension(1200, 750));
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
-
         getContentPane().setBackground(SolumBaseGUI.BACKGROUND);
 
-        // 🔥 TITLE
         JLabel title = new JLabel("Edit Account and Profile", SwingConstants.CENTER);
         title.setFont(SolumBaseGUI.TITLE_FONT);
         title.setForeground(SolumBaseGUI.NEON_PURPLE);
         title.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
-
         add(title, BorderLayout.NORTH);
 
-        // 🔥 MAIN PANEL
-        JPanel panel = new JPanel(new GridLayout(5, 2, 20, 20));
+        JPanel panel = new JPanel(new GridLayout(4, 2, 20, 20));
         panel.setBackground(SolumBaseGUI.BACKGROUND);
         panel.setBorder(BorderFactory.createEmptyBorder(50, 200, 50, 200));
 
-        // Username
         panel.add(createLabel("Username:"));
         usernameLabel = createValueLabel("");
         panel.add(usernameLabel);
 
-        // Height dropdown
         panel.add(createLabel("Height (in):"));
         heightBox = new JComboBox<>(createNumberRange(48, 84));
         styleComponent(heightBox);
         panel.add(heightBox);
 
-        // Weight dropdown (70–400)
         panel.add(createLabel("Weight (lbs):"));
         weightBox = new JComboBox<>(createNumberRange(70, 400));
         styleComponent(weightBox);
         panel.add(weightBox);
 
-        // Goal
         panel.add(createLabel("Goal:"));
         goalBox = new JComboBox<>(new String[]{
                 "WEIGHT_LOSS", "MUSCLE_GAIN", "MAINTENANCE"
@@ -63,7 +54,6 @@ public class EditProfileScreen extends JFrame {
 
         add(panel, BorderLayout.CENTER);
 
-        // 🔥 BUTTONS
         saveButton = new JButton("Save Changes");
         cancelButton = new JButton("Back");
 
@@ -73,14 +63,11 @@ public class EditProfileScreen extends JFrame {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setBackground(SolumBaseGUI.BACKGROUND);
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 40, 0));
-
         buttonPanel.add(saveButton);
         buttonPanel.add(cancelButton);
 
         add(buttonPanel, BorderLayout.SOUTH);
     }
-
-    // ---------- UI HELPERS ----------
 
     private JLabel createLabel(String text) {
         JLabel label = new JLabel(text);
@@ -132,13 +119,13 @@ public class EditProfileScreen extends JFrame {
 
     private Integer[] createNumberRange(int start, int end) {
         Integer[] nums = new Integer[end - start + 1];
+
         for (int i = start; i <= end; i++) {
             nums[i - start] = i;
         }
+
         return nums;
     }
-
-    // ---------- DATA METHODS ----------
 
     public void setProfileData(UserProfile user) {
         usernameLabel.setText(user.getUsername());

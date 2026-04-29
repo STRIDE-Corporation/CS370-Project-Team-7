@@ -22,6 +22,7 @@ public class DashboardController {
         this.dashboardView.addProfileListener(new ProfileListener());
         this.dashboardView.addViewHistoryListener(new HistoryListener());
         this.dashboardView.addLogWorkoutListener(new LogWorkoutListener());
+        this.dashboardView.addStatsListener(new StatsListener());
     }
 
     private class LogoutListener implements ActionListener {
@@ -72,6 +73,18 @@ public class DashboardController {
             );
 
             screen.setVisible(true);
+            dashboardView.setVisible(false);
+        }
+    }
+
+    private class StatsListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+
+            StatsScreen statsScreen = new StatsScreen();
+            new StatsController(statsScreen, dashboardView, currentUser, workoutManager);
+
+            statsScreen.setVisible(true);
             dashboardView.setVisible(false);
         }
     }

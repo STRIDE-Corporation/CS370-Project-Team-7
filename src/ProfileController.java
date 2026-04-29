@@ -25,7 +25,7 @@ public class ProfileController {
             new EditProfileController(editScreen, profileView, currentUser, accountManager);
 
             editScreen.setVisible(true);
-            profileView.setVisible(false); 
+            profileView.setVisible(false);
         }
     }
     private class BackListener implements ActionListener {
