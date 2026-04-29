@@ -119,6 +119,53 @@ public class AccountManager {
         }
     }
 
+    public boolean deleteProfile(int userId, String username) {
+        String deleteExercisesSql = """
+        DELETE FROM exercise_entries
+        WHERE workout_id IN (
+            SELECT workout_id FROM workouts WHERE username = ?
+        )
+        """;
+
+        String deleteWorkoutsSql = "DELETE FROM workouts WHERE username = ?";
+        String deleteUserSql = "DELETE FROM users WHERE user_id = ? AND username = ?";
+
+        try (Connection conn = db.connect()) {
+            conn.setAutoCommit(false);
+
+            try (
+                    PreparedStatement deleteExercisesStmt = conn.prepareStatement(deleteExercisesSql);
+                    PreparedStatement deleteWorkoutsStmt = conn.prepareStatement(deleteWorkoutsSql);
+                    PreparedStatement deleteUserStmt = conn.prepareStatement(deleteUserSql)
+            ) {
+                deleteExercisesStmt.setString(1, username);
+                deleteExercisesStmt.executeUpdate();
+
+                deleteWorkoutsStmt.setString(1, username);
+                deleteWorkoutsStmt.executeUpdate();
+
+                deleteUserStmt.setInt(1, userId);
+                deleteUserStmt.setString(2, username);
+
+                int rows = deleteUserStmt.executeUpdate();
+
+                conn.commit();
+                return rows > 0;
+
+            } catch (SQLException e) {
+                conn.rollback();
+                e.printStackTrace();
+                return false;
+            } finally {
+                conn.setAutoCommit(true);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public void displayAllUsers() {
         String sql = "SELECT * FROM users";
 

@@ -1,5 +1,6 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.JOptionPane;
 
 public class EditProfileController {
 
@@ -18,6 +19,7 @@ public class EditProfileController {
         this.editView.setProfileData(currentUser);
         this.editView.addSaveListener(new SaveListener());
         this.editView.addCancelListener(new CancelListener());
+        this.editView.addDeleteListener(new DeleteListener());
     }
 
     private void returnToProfileScreen() {
@@ -70,6 +72,45 @@ public class EditProfileController {
         @Override
         public void actionPerformed(ActionEvent e) {
             returnToProfileScreen();
+        }
+    }
+
+    private class DeleteListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            int confirm = JOptionPane.showConfirmDialog(
+                    editView,
+                    "Are you sure you want to delete your profile?\nThis will permanently delete your account and workout history.",
+                    "Confirm Delete Profile",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+            if (confirm != JOptionPane.YES_OPTION) {
+                return;
+            }
+
+            boolean deleted = accountManager.deleteProfile(
+                    currentUser.getUserID(),
+                    currentUser.getUsername()
+            );
+
+            if (deleted) {
+                editView.showMessage("Profile deleted successfully.");
+
+                LoginScreen loginScreen = new LoginScreen();
+                DatabaseHandler db = new DatabaseHandler();
+                AccountManager newAccountManager = new AccountManager(db);
+                WorkoutManager newWorkoutManager = new WorkoutManager(db);
+                new LoginController(loginScreen, newAccountManager, newWorkoutManager);
+
+                profileView.dispose();
+                editView.dispose();
+                loginScreen.setVisible(true);
+
+            } else {
+                editView.showError("Database error: Could not delete profile.");
+            }
         }
     }
 }
