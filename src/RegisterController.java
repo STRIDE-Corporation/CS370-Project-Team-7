@@ -30,6 +30,16 @@ public class RegisterController {
                 return;
             }
 
+            if (!ValidationUtils.isValidUsername(username)) {
+                registerView.displayErrorMessage("Username must be between 3 and 20 characters.");
+                return;
+            }
+
+            if (!ValidationUtils.isValidPassword(password)) {
+                registerView.displayErrorMessage("Password must be between 4 and 30 characters.");
+                return;
+            }
+
             if (accountManager.usernameExists(username)) {
                 registerView.displayErrorMessage("Username already exists.");
                 return;
@@ -46,8 +56,13 @@ public class RegisterController {
                 return;
             }
 
-            if (height <= 0 || weight <= 0) {
-                registerView.displayErrorMessage("Height and weight must be positive.");
+            if (!ValidationUtils.isValidHeight(height)) {
+                registerView.displayErrorMessage("Height must be between 36 and 96 inches.");
+                return;
+            }
+
+            if (!ValidationUtils.isValidWeight(weight)) {
+                registerView.displayErrorMessage("Weight must be between 70 and 400 lbs.");
                 return;
             }
 

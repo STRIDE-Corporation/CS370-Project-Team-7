@@ -27,8 +27,13 @@ public class EditProfileController {
                 int newWeight = Integer.parseInt(editView.getWeightInput());
                 UserProfile.Goal newGoal = UserProfile.Goal.valueOf(editView.getGoalInput());
 
-                if (newHeight <= 0 || newWeight <= 0) {
-                    editView.showError("Height and weight must be positive numbers.");
+                if (!ValidationUtils.isValidHeight(newHeight)) {
+                    editView.showError("Height must be between 36 and 96 inches.");
+                    return;
+                }
+
+                if (!ValidationUtils.isValidWeight(newWeight)) {
+                    editView.showError("Weight must be between 70 and 400 lbs.");
                     return;
                 }
 

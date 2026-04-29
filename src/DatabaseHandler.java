@@ -30,7 +30,8 @@ public class DatabaseHandler {
                 username TEXT NOT NULL,
                 workout_datetime TEXT NOT NULL,
                 duration INTEGER NOT NULL,
-                calories_burned INTEGER NOT NULL DEFAULT 0
+                calories_burned INTEGER NOT NULL DEFAULT 0,
+                notes TEXT
             );
             """;
 

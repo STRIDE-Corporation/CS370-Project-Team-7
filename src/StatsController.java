@@ -31,6 +31,19 @@ public class StatsController {
         DefaultCategoryDataset dataset =
                 workoutManager.getUserCaloriesDataset(currentUser.getUsername());
 
+        int projectedCalories = workoutManager.getProjectedCalories(
+                currentUser.getUsername(),
+                currentUser.getGoal()
+        );
+
+        if (projectedCalories != -1) {
+            dataset.addValue(
+                    projectedCalories,
+                    "Projection",
+                    "Next Workout"
+            );
+        }
+
         JFreeChart chart = ChartFactory.createBarChart(
                 "Calories Burned",
                 "Workout",
@@ -44,6 +57,7 @@ public class StatsController {
 
         return new ChartPanel(chart);
     }
+
     private class BackListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {

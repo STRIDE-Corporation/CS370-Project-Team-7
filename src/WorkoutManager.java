@@ -10,8 +10,8 @@ public class WorkoutManager {
         this.db = db;
     }
 
-    public Workout addWorkout(String username) {
-        String sql = "INSERT INTO workouts(username, workout_datetime, duration, calories_burned) VALUES(?,?,?,?)";
+    public Workout addWorkout(String username, String notes) {
+        String sql = "INSERT INTO workouts(username, workout_datetime, duration, calories_burned, notes) VALUES(?,?,?,?,?)";
 
         try (Connection conn = db.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -22,6 +22,7 @@ public class WorkoutManager {
             pstmt.setString(2, workoutDateTime);
             pstmt.setInt(3, 0);
             pstmt.setInt(4, 0);
+            pstmt.setString(5, notes);
 
             pstmt.executeUpdate();
 
@@ -128,12 +129,14 @@ public class WorkoutManager {
                 String dateTime = workoutRs.getString("workout_datetime");
                 int duration = workoutRs.getInt("duration");
                 int caloriesBurned = workoutRs.getInt("calories_burned");
+                String notes = workoutRs.getString("notes");
 
                 history.append("Workout ID: ").append(workoutId).append("\n");
                 history.append("Date: ").append(dateTime).append("\n");
                 history.append("Total Duration: ").append(duration).append(" minutes\n");
                 history.append("Total Calories Burned: ").append(caloriesBurned).append("\n");
                 history.append("Exercises:\n");
+                history.append("Notes: ").append(notes == null ? "None" : notes).append("\n");
 
                 try (PreparedStatement exerciseStmt = conn.prepareStatement(exerciseSql)) {
                     exerciseStmt.setInt(1, workoutId);
@@ -213,6 +216,68 @@ public class WorkoutManager {
         }
 
         return dataset;
+    }
+
+    public int getWorkoutCount(String username) {
+        String sql = "SELECT COUNT(*) AS workout_count FROM workouts WHERE username = ?";
+
+        try (Connection conn = db.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, username);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt("workout_count");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+
+    public double getAverageCaloriesBurned(String username) {
+        String sql = "SELECT AVG(calories_burned) AS avg_calories FROM workouts WHERE username = ?";
+
+        try (Connection conn = db.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, username);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                return rs.getDouble("avg_calories");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+
+    public int getProjectedCalories(String username, UserProfile.Goal goal) {
+        int workoutCount = getWorkoutCount(username);
+
+        if (workoutCount < 3) {
+            return -1;
+        }
+
+        double average = getAverageCaloriesBurned(username);
+
+        switch (goal) {
+            case WEIGHT_LOSS:
+                return (int) Math.round(average * 1.15);
+
+            case WEIGHT_GAIN:
+                return (int) Math.round(average * 0.85);
+
+            case MAINTENANCE:
+            default:
+                return (int) Math.round(average);
+        }
     }
 
     public boolean deleteWorkout(int workoutId, String username) {

@@ -54,18 +54,34 @@ public class LogWorkoutController {
                 int duration = Integer.parseInt(durationText);
                 int caloriesBurned = Integer.parseInt(caloriesText);
 
-                if (sets <= 0 || reps <= 0 || duration <= 0) {
-                    view.showError("Sets, reps, and duration must be positive.");
+                if (!ValidationUtils.isValidExerciseName(exercise)) {
+                    view.showError("Exercise name must be between 1 and 50 characters.");
                     return;
                 }
 
-                if (caloriesBurned < 0) {
-                    view.showError("Calories burned cannot be negative.");
+                if (!ValidationUtils.isValidSets(sets)) {
+                    view.showError("Sets must be between 1 and 20.");
+                    return;
+                }
+
+                if (!ValidationUtils.isValidReps(reps)) {
+                    view.showError("Reps must be between 1 and 100.");
+                    return;
+                }
+
+                if (!ValidationUtils.isValidDuration(duration)) {
+                    view.showError("Duration must be between 1 and 300 minutes.");
+                    return;
+                }
+
+                if (!ValidationUtils.isValidCalories(caloriesBurned)) {
+                    view.showError("Calories burned must be between 100 and 1000.");
                     return;
                 }
 
                 if (!workoutStarted) {
-                    currentWorkout = workoutManager.addWorkout(currentUser.getUsername());
+                    String notes = view.getNotes();
+                    currentWorkout = workoutManager.addWorkout(currentUser.getUsername(), notes);
 
                     if (currentWorkout == null) {
                         view.showError("Failed to create workout.");
