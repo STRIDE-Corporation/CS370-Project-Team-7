@@ -32,6 +32,8 @@ public class LogWorkoutController {
             try {
                 String exercise = view.getExerciseName();
                 String durationText = view.getDuration();
+                String setsText = view.getSets();
+                String repsText = view.getReps();
 
                 if (exercise.isEmpty()) {
                     view.showError("Exercise name required.");
@@ -43,8 +45,18 @@ public class LogWorkoutController {
                     return;
                 }
 
-                int sets = Integer.parseInt(view.getSets());
-                int reps = Integer.parseInt(view.getReps());
+                if (setsText.isEmpty()) {
+                    view.showError("Sets are required.");
+                    return;
+                }
+
+                if (repsText.isEmpty()) {
+                    view.showError("Reps are required.");
+                    return;
+                }
+
+                int sets = Integer.parseInt(setsText);
+                int reps = Integer.parseInt(repsText);
                 int duration = Integer.parseInt(durationText);
 
                 int caloriesBurned = duration * 6;
@@ -107,7 +119,7 @@ public class LogWorkoutController {
                 view.clearExerciseFields();
 
             } catch (NumberFormatException ex) {
-                view.showError("Please enter valid numbers.");
+                view.showError("Please enter valid numbers for sets, reps, and duration.");
             }
         }
     }

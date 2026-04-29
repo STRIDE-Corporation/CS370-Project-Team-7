@@ -41,7 +41,6 @@ public class LogWorkoutScreen extends JFrame {
         exerciseNameField = new JTextField();
         setsField = new JTextField();
         repsField = new JTextField();
-
         caloriesEstimateLabel = createPurpleValueLabel("0");
 
         styleInputField(durationField);
@@ -76,7 +75,6 @@ public class LogWorkoutScreen extends JFrame {
         notesArea.setText("- ");
         notesArea.setBorder(BorderFactory.createLineBorder(SolumBaseGUI.NEON_PURPLE, 1));
 
-        // 🔥 BULLET POINT AUTO-INSERT FIX
         notesArea.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
