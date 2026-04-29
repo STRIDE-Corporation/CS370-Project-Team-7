@@ -28,7 +28,6 @@ public class DashboardController {
     private class LogoutListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-
             LoginScreen loginScreen = new LoginScreen();
             new LoginController(loginScreen, accountManager, workoutManager);
 
@@ -43,7 +42,10 @@ public class DashboardController {
             ProfileScreen profileScreen = new ProfileScreen(accountManager);
             new ProfileController(profileScreen, dashboardView, currentUser, accountManager);
 
+            // Makes Account and Profile page fullscreen
+            profileScreen.setExtendedState(ProfileScreen.MAXIMIZED_BOTH);
             profileScreen.setVisible(true);
+
             dashboardView.setVisible(false);
         }
     }
@@ -51,11 +53,12 @@ public class DashboardController {
     private class HistoryListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-
             WorkoutHistoryScreen historyScreen = new WorkoutHistoryScreen();
             new WorkoutHistoryController(historyScreen, dashboardView, currentUser, workoutManager);
 
+            historyScreen.setExtendedState(WorkoutHistoryScreen.MAXIMIZED_BOTH);
             historyScreen.setVisible(true);
+
             dashboardView.setVisible(false);
         }
     }
@@ -63,7 +66,6 @@ public class DashboardController {
     private class LogWorkoutListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-
             LogWorkoutScreen screen = new LogWorkoutScreen();
             new LogWorkoutController(
                     screen,
@@ -72,7 +74,9 @@ public class DashboardController {
                     currentUser
             );
 
+            screen.setExtendedState(LogWorkoutScreen.MAXIMIZED_BOTH);
             screen.setVisible(true);
+
             dashboardView.setVisible(false);
         }
     }
@@ -80,11 +84,12 @@ public class DashboardController {
     private class StatsListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-
             StatsScreen statsScreen = new StatsScreen();
             new StatsController(statsScreen, dashboardView, currentUser, workoutManager);
 
+            statsScreen.setExtendedState(StatsScreen.MAXIMIZED_BOTH);
             statsScreen.setVisible(true);
+
             dashboardView.setVisible(false);
         }
     }

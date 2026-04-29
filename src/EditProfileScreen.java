@@ -1,6 +1,8 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class EditProfileScreen extends JFrame {
 
@@ -14,40 +16,137 @@ public class EditProfileScreen extends JFrame {
 
     public EditProfileScreen() {
         setTitle("Edit Account and Profile");
-        setSize(400, 300);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
+        getContentPane().setBackground(SolumBaseGUI.BACKGROUND);
 
-        JPanel panel = new JPanel(new GridLayout(6, 2, 10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        JPanel outerPanel = new JPanel(new GridBagLayout());
+        outerPanel.setBackground(SolumBaseGUI.BACKGROUND);
+        outerPanel.setBorder(BorderFactory.createEmptyBorder(40, 80, 40, 80));
 
-        panel.add(new JLabel("Username:"));
-        usernameLabel = new JLabel();
-        panel.add(usernameLabel);
+        JPanel cardPanel = new JPanel(new GridBagLayout());
+        cardPanel.setBackground(SolumBaseGUI.FIELD_BACKGROUND);
+        cardPanel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(SolumBaseGUI.NEON_PURPLE, 2),
+                BorderFactory.createEmptyBorder(45, 65, 45, 65)
+        ));
 
-        panel.add(new JLabel("Height (in):"));
-        heightField = new JTextField();
-        panel.add(heightField);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(14, 14, 14, 14);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        panel.add(new JLabel("Weight (lbs):"));
-        weightField = new JTextField();
-        panel.add(weightField);
+        JLabel titleLabel = new JLabel("Edit Account and Profile", SwingConstants.CENTER);
+        titleLabel.setFont(SolumBaseGUI.TITLE_FONT.deriveFont(Font.BOLD, 36f));
+        titleLabel.setForeground(SolumBaseGUI.NEON_PURPLE);
 
-        panel.add(new JLabel("Goal:"));
-        goalBox = new JComboBox<>(new String[]{
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        cardPanel.add(titleLabel, gbc);
+
+        usernameLabel = createValueLabel();
+        addRow(cardPanel, gbc, 1, "Username:", usernameLabel);
+
+        heightField = createStyledTextField();
+        addRow(cardPanel, gbc, 2, "Height (in):", heightField);
+
+        weightField = createStyledTextField();
+        addRow(cardPanel, gbc, 3, "Weight (lbs):", weightField);
+
+        goalBox = createStyledComboBox();
+        addRow(cardPanel, gbc, 4, "Goal:", goalBox);
+
+        saveButton = createStyledButton("Save Changes");
+        cancelButton = createStyledButton("Cancel");
+
+        gbc.gridy = 5;
+        gbc.gridwidth = 1;
+
+        gbc.gridx = 0;
+        cardPanel.add(saveButton, gbc);
+
+        gbc.gridx = 1;
+        cardPanel.add(cancelButton, gbc);
+
+        outerPanel.add(cardPanel);
+        add(outerPanel);
+    }
+
+    private void addRow(JPanel panel, GridBagConstraints gbc, int row, String labelText, JComponent input) {
+        JLabel label = new JLabel(labelText);
+        label.setFont(SolumBaseGUI.TEXT_FONT.deriveFont(Font.BOLD, 22f));
+        label.setForeground(SolumBaseGUI.WHITE);
+
+        gbc.gridy = row;
+        gbc.gridwidth = 1;
+
+        gbc.gridx = 0;
+        panel.add(label, gbc);
+
+        gbc.gridx = 1;
+        input.setPreferredSize(new Dimension(340, 50));
+        panel.add(input, gbc);
+    }
+
+    private JLabel createValueLabel() {
+        JLabel label = new JLabel();
+        label.setFont(SolumBaseGUI.TEXT_FONT.deriveFont(Font.BOLD, 22f));
+        label.setForeground(SolumBaseGUI.NEON_PURPLE);
+        return label;
+    }
+
+    private JTextField createStyledTextField() {
+        JTextField field = new JTextField();
+        field.setBackground(SolumBaseGUI.BUTTON_BACKGROUND);
+        field.setForeground(SolumBaseGUI.WHITE);
+        field.setCaretColor(SolumBaseGUI.WHITE);
+        field.setFont(SolumBaseGUI.TEXT_FONT.deriveFont(Font.PLAIN, 22f));
+        field.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(SolumBaseGUI.NEON_PURPLE, 2),
+                BorderFactory.createEmptyBorder(5, 12, 5, 12)
+        ));
+        return field;
+    }
+
+    private JComboBox<String> createStyledComboBox() {
+        JComboBox<String> box = new JComboBox<>(new String[]{
                 "WEIGHT_LOSS",
                 "WEIGHT_GAIN",
                 "MAINTENANCE"
         });
-        panel.add(goalBox);
 
-        saveButton = new JButton("Save Changes");
-        cancelButton = new JButton("Cancel");
+        box.setBackground(SolumBaseGUI.BUTTON_BACKGROUND);
+        box.setForeground(SolumBaseGUI.WHITE);
+        box.setFont(SolumBaseGUI.TEXT_FONT.deriveFont(Font.BOLD, 20f));
+        box.setBorder(BorderFactory.createLineBorder(SolumBaseGUI.NEON_PURPLE, 2));
+        box.setFocusable(false);
 
-        panel.add(saveButton);
-        panel.add(cancelButton);
+        return box;
+    }
 
-        add(panel);
+    private JButton createStyledButton(String text) {
+        JButton button = new JButton(text);
+        button.setBackground(SolumBaseGUI.BUTTON_BACKGROUND);
+        button.setForeground(SolumBaseGUI.NEON_PURPLE);
+        button.setFont(SolumBaseGUI.BUTTON_FONT.deriveFont(Font.BOLD, 20f));
+        button.setBorder(BorderFactory.createLineBorder(SolumBaseGUI.NEON_PURPLE, 2));
+        button.setFocusPainted(false);
+        button.setPreferredSize(new Dimension(260, 58));
+
+        button.addMouseListener(new MouseAdapter() {
+            public void mouseEntered(MouseEvent e) {
+                button.setBackground(SolumBaseGUI.BUTTON_HOVER);
+                button.setBorder(BorderFactory.createLineBorder(SolumBaseGUI.GLOW_STRONG, 3));
+            }
+
+            public void mouseExited(MouseEvent e) {
+                button.setBackground(SolumBaseGUI.BUTTON_BACKGROUND);
+                button.setBorder(BorderFactory.createLineBorder(SolumBaseGUI.NEON_PURPLE, 2));
+            }
+        });
+
+        return button;
     }
 
     public void setProfileData(UserProfile user) {

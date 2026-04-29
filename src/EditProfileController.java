@@ -4,7 +4,7 @@ import java.awt.event.ActionListener;
 public class EditProfileController {
 
     private EditProfileScreen editView;
-    private ProfileScreen profileView; // We go back here when done
+    private ProfileScreen profileView;
     private UserProfile currentUser;
     private AccountManager accountManager;
 
@@ -14,9 +14,17 @@ public class EditProfileController {
         this.profileView = profileView;
         this.currentUser = currentUser;
         this.accountManager = accountManager;
+
         this.editView.setProfileData(currentUser);
         this.editView.addSaveListener(new SaveListener());
         this.editView.addCancelListener(new CancelListener());
+    }
+
+    private void returnToProfileScreen() {
+        profileView.setProfileData(currentUser);
+        profileView.setExtendedState(ProfileScreen.MAXIMIZED_BOTH);
+        profileView.setVisible(true);
+        editView.dispose();
     }
 
     private class SaveListener implements ActionListener {
@@ -37,23 +45,17 @@ public class EditProfileController {
                     return;
                 }
 
-                // accountManager.updateProfile() MUST exist in your AccountManager.java file
                 boolean success = accountManager.updateProfile(
                         currentUser.getUserID(), newHeight, newWeight, newGoal
                 );
 
                 if (success) {
-                    // Update memory
                     currentUser.setHeight(newHeight);
                     currentUser.setWeight(newWeight);
                     currentUser.setGoal(newGoal);
 
                     editView.showMessage("Profile updated successfully!");
-
-                    // Refresh the read-only screen with new data and go back to it
-                    profileView.setProfileData(currentUser);
-                    profileView.setVisible(true);
-                    editView.dispose();
+                    returnToProfileScreen();
                 } else {
                     editView.showError("Database error: Could not update profile.");
                 }
@@ -67,9 +69,7 @@ public class EditProfileController {
     private class CancelListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            // Just go back without saving
-            profileView.setVisible(true);
-            editView.dispose();
+            returnToProfileScreen();
         }
     }
 }

@@ -23,20 +23,55 @@ public class ProfileScreen extends JFrame {
         this.accountManager = accountManager;
 
         setTitle("Account and Profile");
-        setSize(500, 450);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         getContentPane().setBackground(SolumBaseGUI.BACKGROUND);
 
-        JPanel panel = new JPanel(new GridLayout(8, 1, 10, 10));
-        panel.setBackground(SolumBaseGUI.BACKGROUND);
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 25, 20, 25));
+        JPanel outerPanel = new JPanel(new GridBagLayout());
+        outerPanel.setBackground(SolumBaseGUI.BACKGROUND);
+        outerPanel.setBorder(BorderFactory.createEmptyBorder(40, 80, 40, 80));
+
+        JPanel cardPanel = new JPanel(new GridBagLayout());
+        cardPanel.setBackground(SolumBaseGUI.FIELD_BACKGROUND);
+        cardPanel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(SolumBaseGUI.NEON_PURPLE, 2),
+                BorderFactory.createEmptyBorder(40, 60, 40, 60)
+        ));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(14, 14, 14, 14);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridx = 0;
+        gbc.gridwidth = 2;
+
+        JLabel titleLabel = new JLabel("Account and Profile", SwingConstants.CENTER);
+        titleLabel.setFont(SolumBaseGUI.TITLE_FONT.deriveFont(Font.BOLD, 36f));
+        titleLabel.setForeground(SolumBaseGUI.NEON_PURPLE);
+
+        gbc.gridy = 0;
+        cardPanel.add(titleLabel, gbc);
 
         usernameLabel = createProfileLabel();
         heightLabel = createProfileLabel();
         weightLabel = createProfileLabel();
         goalLabel = createProfileLabel();
         unitPreferenceLabel = createProfileLabel();
+
+        gbc.gridy = 1;
+        cardPanel.add(usernameLabel, gbc);
+
+        gbc.gridy = 2;
+        cardPanel.add(heightLabel, gbc);
+
+        gbc.gridy = 3;
+        cardPanel.add(weightLabel, gbc);
+
+        gbc.gridy = 4;
+        cardPanel.add(goalLabel, gbc);
+
+        gbc.gridy = 5;
+        cardPanel.add(unitPreferenceLabel, gbc);
 
         imperialButton = createRadioButton("Imperial");
         metricButton = createRadioButton("Metric");
@@ -45,27 +80,28 @@ public class ProfileScreen extends JFrame {
         unitGroup.add(imperialButton);
         unitGroup.add(metricButton);
 
-        JPanel unitPanel = new JPanel();
-        unitPanel.setBackground(SolumBaseGUI.BACKGROUND);
+        JPanel unitPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
+        unitPanel.setBackground(SolumBaseGUI.FIELD_BACKGROUND);
         unitPanel.add(imperialButton);
         unitPanel.add(metricButton);
 
-        editButton = new JButton("Edit Profile");
+        gbc.gridy = 6;
+        cardPanel.add(unitPanel, gbc);
+
+        editButton = new JButton("Edit Account and Profile");
         backButton = new JButton("Back");
 
         styleButton(editButton);
         styleButton(backButton);
 
-        panel.add(usernameLabel);
-        panel.add(heightLabel);
-        panel.add(weightLabel);
-        panel.add(goalLabel);
-        panel.add(unitPreferenceLabel);
-        panel.add(unitPanel);
-        panel.add(editButton);
-        panel.add(backButton);
+        gbc.gridy = 7;
+        cardPanel.add(editButton, gbc);
 
-        add(panel);
+        gbc.gridy = 8;
+        cardPanel.add(backButton, gbc);
+
+        outerPanel.add(cardPanel);
+        add(outerPanel);
 
         imperialButton.addActionListener(e -> saveUnitPreference(UserProfile.UnitPreference.IMPERIAL));
         metricButton.addActionListener(e -> saveUnitPreference(UserProfile.UnitPreference.METRIC));
@@ -73,25 +109,26 @@ public class ProfileScreen extends JFrame {
 
     private JLabel createProfileLabel() {
         JLabel label = new JLabel("", SwingConstants.CENTER);
-        label.setFont(SolumBaseGUI.TEXT_FONT);
+        label.setFont(SolumBaseGUI.TEXT_FONT.deriveFont(Font.PLAIN, 24f));
         label.setForeground(SolumBaseGUI.NEON_PURPLE);
         return label;
     }
 
     private JRadioButton createRadioButton(String text) {
         JRadioButton button = new JRadioButton(text);
-        button.setFont(SolumBaseGUI.BUTTON_FONT);
+        button.setFont(SolumBaseGUI.BUTTON_FONT.deriveFont(Font.PLAIN, 18f));
         button.setForeground(SolumBaseGUI.NEON_PURPLE);
-        button.setBackground(SolumBaseGUI.BACKGROUND);
+        button.setBackground(SolumBaseGUI.FIELD_BACKGROUND);
         button.setFocusPainted(false);
         return button;
     }
 
     private void styleButton(JButton button) {
-        button.setFont(SolumBaseGUI.BUTTON_FONT);
+        button.setFont(SolumBaseGUI.BUTTON_FONT.deriveFont(Font.BOLD, 20f));
         button.setBackground(SolumBaseGUI.BUTTON_BACKGROUND);
         button.setForeground(SolumBaseGUI.NEON_PURPLE);
         button.setFocusPainted(false);
+        button.setPreferredSize(new Dimension(420, 55));
         button.setBorder(BorderFactory.createLineBorder(SolumBaseGUI.NEON_PURPLE, 2));
 
         button.addMouseListener(new java.awt.event.MouseAdapter() {
