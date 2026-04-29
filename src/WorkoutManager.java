@@ -218,6 +218,68 @@ public class WorkoutManager {
         return dataset;
     }
 
+    public int getWorkoutCount(String username) {
+        String sql = "SELECT COUNT(*) AS workout_count FROM workouts WHERE username = ?";
+
+        try (Connection conn = db.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, username);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt("workout_count");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+
+    public double getAverageCaloriesBurned(String username) {
+        String sql = "SELECT AVG(calories_burned) AS avg_calories FROM workouts WHERE username = ?";
+
+        try (Connection conn = db.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, username);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                return rs.getDouble("avg_calories");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+
+    public int getProjectedCalories(String username, UserProfile.Goal goal) {
+        int workoutCount = getWorkoutCount(username);
+
+        if (workoutCount < 3) {
+            return -1;
+        }
+
+        double average = getAverageCaloriesBurned(username);
+
+        switch (goal) {
+            case WEIGHT_LOSS:
+                return (int) Math.round(average * 1.15);
+
+            case WEIGHT_GAIN:
+                return (int) Math.round(average * 0.85);
+
+            case MAINTENANCE:
+            default:
+                return (int) Math.round(average);
+        }
+    }
+
     public boolean deleteWorkout(int workoutId, String username) {
         String checkSql = "SELECT workout_id FROM workouts WHERE workout_id = ? AND username = ?";
         String deleteExercisesSql = "DELETE FROM exercise_entries WHERE workout_id = ?";
