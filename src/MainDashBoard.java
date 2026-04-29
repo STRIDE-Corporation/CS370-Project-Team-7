@@ -11,7 +11,7 @@ public class MainDashBoard extends JFrame {
     private JButton statsButton;
 
     public MainDashBoard(String username) {
-        setTitle("Solum - Dashboard");
+        setTitle("Dashboard");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout(10, 10));
         getContentPane().setBackground(SolumBaseGUI.BACKGROUND);
@@ -36,7 +36,7 @@ public class MainDashBoard extends JFrame {
         logWorkoutButton = new JButton("Log Workout");
         viewHistoryButton = new JButton("Workout History");
         profileButton = new JButton("Account and Profile");
-        statsButton = new JButton("View Stats");
+        statsButton = new JButton("Workout Stats");
         styleDashboardButton(statsButton);
 
         styleDashboardButton(logWorkoutButton);

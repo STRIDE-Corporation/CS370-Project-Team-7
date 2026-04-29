@@ -1,6 +1,10 @@
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 public class LogWorkoutScreen extends JFrame {
 
@@ -8,7 +12,7 @@ public class LogWorkoutScreen extends JFrame {
     private JTextField exerciseNameField;
     private JTextField setsField;
     private JTextField repsField;
-    private JTextField caloriesField;
+    private JLabel caloriesEstimateLabel;
 
     private JTextArea exerciseListArea;
     private JTextArea notesArea;
@@ -37,13 +41,15 @@ public class LogWorkoutScreen extends JFrame {
         exerciseNameField = new JTextField();
         setsField = new JTextField();
         repsField = new JTextField();
-        caloriesField = new JTextField();
+
+        caloriesEstimateLabel = createPurpleValueLabel("0");
 
         styleInputField(durationField);
         styleInputField(exerciseNameField);
         styleInputField(setsField);
         styleInputField(repsField);
-        styleInputField(caloriesField);
+
+        addDurationLiveUpdate();
 
         inputPanel.add(createLabel("Duration (min):"));
         inputPanel.add(durationField);
@@ -57,15 +63,29 @@ public class LogWorkoutScreen extends JFrame {
         inputPanel.add(createLabel("Reps:"));
         inputPanel.add(repsField);
 
-        inputPanel.add(createLabel("Calories Burned:"));
-        inputPanel.add(caloriesField);
+        inputPanel.add(createLabel("Estimated Calories Burned:"));
+        inputPanel.add(caloriesEstimateLabel);
 
         notesArea = new JTextArea(3, 20);
         notesArea.setFont(SolumBaseGUI.TEXT_FONT);
         notesArea.setBackground(SolumBaseGUI.FIELD_BACKGROUND);
         notesArea.setForeground(SolumBaseGUI.WHITE);
         notesArea.setCaretColor(SolumBaseGUI.WHITE);
+        notesArea.setLineWrap(true);
+        notesArea.setWrapStyleWord(true);
+        notesArea.setText("- ");
         notesArea.setBorder(BorderFactory.createLineBorder(SolumBaseGUI.NEON_PURPLE, 1));
+
+        // 🔥 BULLET POINT AUTO-INSERT FIX
+        notesArea.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    e.consume();
+                    notesArea.append("\n- ");
+                }
+            }
+        });
 
         JScrollPane notesScroll = new JScrollPane(notesArea);
 
@@ -105,7 +125,53 @@ public class LogWorkoutScreen extends JFrame {
         add(bottomPanel, BorderLayout.SOUTH);
     }
 
+    private void addDurationLiveUpdate() {
+        durationField.getDocument().addDocumentListener(new DocumentListener() {
+            public void insertUpdate(DocumentEvent e) {
+                updateCaloriesFromDuration();
+            }
+
+            public void removeUpdate(DocumentEvent e) {
+                updateCaloriesFromDuration();
+            }
+
+            public void changedUpdate(DocumentEvent e) {
+                updateCaloriesFromDuration();
+            }
+        });
+    }
+
+    private void updateCaloriesFromDuration() {
+        try {
+            String durationText = durationField.getText().trim();
+
+            if (durationText.isEmpty()) {
+                setCaloriesEstimate(0);
+                return;
+            }
+
+            int duration = Integer.parseInt(durationText);
+
+            if (duration <= 0) {
+                setCaloriesEstimate(0);
+                return;
+            }
+
+            setCaloriesEstimate(duration * 6);
+
+        } catch (NumberFormatException e) {
+            setCaloriesEstimate(0);
+        }
+    }
+
     private JLabel createLabel(String text) {
+        JLabel label = new JLabel(text);
+        label.setFont(SolumBaseGUI.TEXT_FONT);
+        label.setForeground(SolumBaseGUI.NEON_PURPLE);
+        return label;
+    }
+
+    private JLabel createPurpleValueLabel(String text) {
         JLabel label = new JLabel(text);
         label.setFont(SolumBaseGUI.TEXT_FONT);
         label.setForeground(SolumBaseGUI.NEON_PURPLE);
@@ -157,18 +223,20 @@ public class LogWorkoutScreen extends JFrame {
         return repsField.getText().trim();
     }
 
-    public String getCaloriesBurned() {
-        return caloriesField.getText().trim();
+    public String getNotes() {
+        return notesArea.getText().trim();
     }
 
-    public String getNotes() { return notesArea.getText().trim(); }
+    public void setCaloriesEstimate(int calories) {
+        caloriesEstimateLabel.setText(String.valueOf(calories));
+    }
 
     public void clearExerciseFields() {
         durationField.setText("");
         exerciseNameField.setText("");
         setsField.setText("");
         repsField.setText("");
-        caloriesField.setText("");
+        setCaloriesEstimate(0);
     }
 
     public void appendExercise(String text) {

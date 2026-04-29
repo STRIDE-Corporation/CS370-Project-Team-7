@@ -13,7 +13,7 @@ public class EditProfileScreen extends JFrame {
     private JButton cancelButton;
 
     public EditProfileScreen() {
-        setTitle("Solum - Edit Account and Profile");
+        setTitle("Edit Account and Profile");
 
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setMinimumSize(new Dimension(1200, 750));
@@ -45,8 +45,13 @@ public class EditProfileScreen extends JFrame {
         styleComponent(weightBox);
         panel.add(weightBox);
 
-        panel.add(new JLabel("Goal:"));
-        goalBox = new JComboBox<>(new String[]{ "WEIGHT_LOSS", "WEIGHT_GAIN", "MAINTENANCE" });
+        panel.add(createLabel("Goal:"));
+        goalBox = new JComboBox<>(new String[]{
+                "WEIGHT_LOSS",
+                "WEIGHT_GAIN",
+                "MAINTENANCE"
+        });
+        styleComponent(goalBox);
         panel.add(goalBox);
 
         add(panel, BorderLayout.CENTER);

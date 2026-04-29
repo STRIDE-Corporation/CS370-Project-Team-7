@@ -11,7 +11,7 @@ public class LoginScreen extends JFrame {
     private JButton closeButton;
 
     public LoginScreen() {
-        setTitle("Solum Login");
+        setTitle("Login");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         JPanel panel = new JPanel(new GridBagLayout());

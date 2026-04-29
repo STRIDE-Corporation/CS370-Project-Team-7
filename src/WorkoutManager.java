@@ -134,9 +134,15 @@ public class WorkoutManager {
                 history.append("Workout ID: ").append(workoutId).append("\n");
                 history.append("Date: ").append(dateTime).append("\n");
                 history.append("Total Duration: ").append(duration).append(" minutes\n");
-                history.append("Total Calories Burned: ").append(caloriesBurned).append("\n");
+                history.append("Estimated Total Calories Burned: ").append(caloriesBurned).append("\n");
+
+                if (notes == null || notes.trim().isEmpty()) {
+                    history.append("Notes: None\n");
+                } else {
+                    history.append("Notes:\n").append(formatNotes(notes)).append("\n");
+                }
+
                 history.append("Exercises:\n");
-                history.append("Notes: ").append(notes == null ? "None" : notes).append("\n");
 
                 try (PreparedStatement exerciseStmt = conn.prepareStatement(exerciseSql)) {
                     exerciseStmt.setInt(1, workoutId);
@@ -160,7 +166,7 @@ public class WorkoutManager {
                         history.append("  Sets: ").append(entry.getSets()).append("\n");
                         history.append("  Reps: ").append(entry.getReps()).append("\n");
                         history.append("  Duration: ").append(entry.getDuration()).append(" minutes\n");
-                        history.append("  Calories Burned: ").append(entry.getCaloriesBurned()).append("\n");
+                        history.append("  Estimated Calories Burned: ").append(entry.getCaloriesBurned()).append("\n");
                         history.append("  -------------------\n");
                     }
 
@@ -182,6 +188,27 @@ public class WorkoutManager {
         }
 
         return history.toString();
+    }
+
+    private String formatNotes(String notes) {
+        String[] lines = notes.split("\\R");
+        StringBuilder formattedNotes = new StringBuilder();
+
+        for (String line : lines) {
+            String trimmed = line.trim();
+
+            if (trimmed.isEmpty()) {
+                continue;
+            }
+
+            if (trimmed.startsWith("-")) {
+                formattedNotes.append(trimmed).append("\n");
+            } else {
+                formattedNotes.append("- ").append(trimmed).append("\n");
+            }
+        }
+
+        return formattedNotes.toString();
     }
 
     public DefaultCategoryDataset getUserCaloriesDataset(String username) {
@@ -206,7 +233,7 @@ public class WorkoutManager {
 
                 dataset.addValue(
                         caloriesBurned,
-                        "Calories Burned",
+                        "Estimated Calories Burned",
                         "Workout " + workoutId
                 );
             }

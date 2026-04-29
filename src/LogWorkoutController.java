@@ -32,7 +32,6 @@ public class LogWorkoutController {
             try {
                 String exercise = view.getExerciseName();
                 String durationText = view.getDuration();
-                String caloriesText = view.getCaloriesBurned();
 
                 if (exercise.isEmpty()) {
                     view.showError("Exercise name required.");
@@ -44,15 +43,12 @@ public class LogWorkoutController {
                     return;
                 }
 
-                if (caloriesText.isEmpty()) {
-                    view.showError("Calories burned is required.");
-                    return;
-                }
-
                 int sets = Integer.parseInt(view.getSets());
                 int reps = Integer.parseInt(view.getReps());
                 int duration = Integer.parseInt(durationText);
-                int caloriesBurned = Integer.parseInt(caloriesText);
+
+                int caloriesBurned = duration * 6;
+                view.setCaloriesEstimate(caloriesBurned);
 
                 if (!ValidationUtils.isValidExerciseName(exercise)) {
                     view.showError("Exercise name must be between 1 and 50 characters.");
@@ -71,11 +67,6 @@ public class LogWorkoutController {
 
                 if (!ValidationUtils.isValidDuration(duration)) {
                     view.showError("Duration must be between 1 and 300 minutes.");
-                    return;
-                }
-
-                if (!ValidationUtils.isValidCalories(caloriesBurned)) {
-                    view.showError("Calories burned must be between 100 and 1000.");
                     return;
                 }
 
@@ -110,7 +101,7 @@ public class LogWorkoutController {
                                 " | Sets: " + sets +
                                 " | Reps: " + reps +
                                 " | Duration: " + duration + " min" +
-                                " | Calories: " + caloriesBurned
+                                " | Estimated Calories: " + caloriesBurned
                 );
 
                 view.clearExerciseFields();
