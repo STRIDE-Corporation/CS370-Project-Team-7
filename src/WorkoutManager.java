@@ -258,6 +258,142 @@ public class WorkoutManager {
         return 0;
     }
 
+    public double getRecentAverageCaloriesBurned(String username, int limit) {
+        String sql = """
+        SELECT calories_burned
+        FROM workouts
+        WHERE username = ?
+        ORDER BY workout_datetime DESC
+        LIMIT ?
+    """;
+
+        try (Connection conn = db.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, username);
+            pstmt.setInt(2, limit);
+
+            ResultSet rs = pstmt.executeQuery();
+
+            int total = 0;
+            int count = 0;
+
+            while (rs.next()) {
+                total += rs.getInt("calories_burned");
+                count++;
+            }
+
+            if (count == 0) {
+                return 0;
+            }
+
+            return (double) total / count;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+
+    public int getCalorieTrend(String username) {
+        String sql = """
+        SELECT calories_burned
+        FROM workouts
+        WHERE username = ?
+        ORDER BY workout_datetime DESC
+        LIMIT 5
+    """;
+
+        try (Connection conn = db.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, username);
+            ResultSet rs = pstmt.executeQuery();
+
+            int[] calories = new int[5];
+            int count = 0;
+
+            while (rs.next() && count < 5) {
+                calories[count] = rs.getInt("calories_burned");
+                count++;
+            }
+
+            if (count < 3) {
+                return 0;
+            }
+
+            int newest = calories[0];
+            int oldest = calories[count - 1];
+
+            return newest - oldest;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+
+    public int getLatestWorkoutCalories(String username) {
+        String sql = """
+        SELECT calories_burned
+        FROM workouts
+        WHERE username = ?
+        ORDER BY workout_datetime DESC
+        LIMIT 1
+    """;
+
+        try (Connection conn = db.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, username);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt("calories_burned");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return -1;
+    }
+
+    public boolean isImproving(String username) {
+        String sql = """
+        SELECT calories_burned
+        FROM workouts
+        WHERE username = ?
+        ORDER BY workout_datetime DESC
+        LIMIT 3
+    """;
+
+        try (Connection conn = db.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, username);
+            ResultSet rs = pstmt.executeQuery();
+
+            int[] last = new int[3];
+            int i = 0;
+
+            while (rs.next() && i < 3) {
+                last[i++] = rs.getInt("calories_burned");
+            }
+
+            if (i < 3) return false;
+
+            return last[0] > last[1] && last[1] > last[2];
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
     public int getProjectedCalories(String username, UserProfile.Goal goal) {
         int workoutCount = getWorkoutCount(username);
 
@@ -265,19 +401,45 @@ public class WorkoutManager {
             return -1;
         }
 
-        double average = getAverageCaloriesBurned(username);
+        double recentAverage = getRecentAverageCaloriesBurned(username, 5);
+        int trend = getCalorieTrend(username);
+
+        double projection = recentAverage;
 
         switch (goal) {
             case WEIGHT_LOSS:
-                return (int) Math.round(average * 1.15);
+                projection = recentAverage * 1.10;
+
+                if (trend > 50) {
+                    projection = recentAverage * 1.15;
+                } else if (trend < -50) {
+                    projection = recentAverage * 1.05;
+                }
+                break;
 
             case WEIGHT_GAIN:
-                return (int) Math.round(average * 0.85);
+                projection = recentAverage * 0.90;
+
+                if (trend > 50) {
+                    projection = recentAverage * 0.85;
+                } else if (trend < -50) {
+                    projection = recentAverage * 0.95;
+                }
+                break;
 
             case MAINTENANCE:
             default:
-                return (int) Math.round(average);
+                projection = recentAverage;
+
+                if (trend > 75) {
+                    projection = recentAverage * 0.95;
+                } else if (trend < -75) {
+                    projection = recentAverage * 1.05;
+                }
+                break;
         }
+
+        return (int) Math.round(projection);
     }
 
     public boolean deleteWorkout(int workoutId, String username) {

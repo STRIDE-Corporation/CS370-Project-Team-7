@@ -19,11 +19,7 @@ public class LogWorkoutScreen extends JFrame {
 
     public LogWorkoutScreen() {
         setTitle("Log Workout");
-
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
-        setMinimumSize(new Dimension(1200, 750));
-        setResizable(true);
-
+        setSize(650, 500);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout(10, 10));
@@ -157,9 +153,7 @@ public class LogWorkoutScreen extends JFrame {
         return repsField.getText().trim();
     }
 
-    public String getCaloriesBurned() {
-        return caloriesField.getText().trim();
-    }
+    public String getCaloriesBurned() { return caloriesField.getText().trim(); }
 
     public String getNotes() { return notesArea.getText().trim(); }
 
