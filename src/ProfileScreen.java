@@ -50,7 +50,7 @@ public class ProfileScreen extends JFrame {
         unitPanel.add(imperialButton);
         unitPanel.add(metricButton);
 
-        editButton = new JButton("Edit Profile");
+        editButton = new JButton("Edit Account and Profile");
         backButton = new JButton("Back");
 
         styleButton(editButton);

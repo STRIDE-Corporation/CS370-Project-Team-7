@@ -30,7 +30,12 @@ public class LogWorkoutScreen extends JFrame {
 
     public LogWorkoutScreen() {
         setTitle("Log Workout");
-        setSize(850, 750);
+
+        // Keeps Log Workout full-size like the dashboard
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setMinimumSize(new Dimension(1200, 750));
+        setResizable(true);
+
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout(10, 10));
@@ -44,7 +49,7 @@ public class LogWorkoutScreen extends JFrame {
         JPanel exercisePanel = createSectionPanel("Exercise Info");
 
         workoutDurationBox = new JComboBox<>(createNumberRange(1, 2400));
-        caloriesBurnedBox = new JComboBox<>(createNumberRange(1, 250000));
+        caloriesBurnedBox = new JComboBox<>(createNumberRange(1, 1000));
 
         workoutSplitBox = new JComboBox<>(new String[]{
                 "Chest", "Back", "Legs", "Shoulders", "Arms",

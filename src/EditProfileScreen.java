@@ -5,8 +5,8 @@ import java.awt.event.ActionListener;
 public class EditProfileScreen extends JFrame {
 
     private JLabel usernameLabel;
-    private JTextField heightField;
-    private JTextField weightField;
+    private JComboBox<Integer> heightBox;
+    private JComboBox<Integer> weightBox;
     private JComboBox<String> goalBox;
 
     private JButton saveButton;
@@ -14,52 +14,164 @@ public class EditProfileScreen extends JFrame {
 
     public EditProfileScreen() {
         setTitle("Solum - Edit Account and Profile");
-        setSize(400, 300);
+
+        // 🔥 FULL SCREEN
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setMinimumSize(new Dimension(1200, 750));
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setLocationRelativeTo(null);
+        setLayout(new BorderLayout());
 
-        JPanel panel = new JPanel(new GridLayout(6, 2, 10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        getContentPane().setBackground(SolumBaseGUI.BACKGROUND);
 
-        panel.add(new JLabel("Username:"));
-        usernameLabel = new JLabel();
+        // 🔥 TITLE
+        JLabel title = new JLabel("Edit Account and Profile", SwingConstants.CENTER);
+        title.setFont(SolumBaseGUI.TITLE_FONT);
+        title.setForeground(SolumBaseGUI.NEON_PURPLE);
+        title.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
+
+        add(title, BorderLayout.NORTH);
+
+        // 🔥 MAIN PANEL
+        JPanel panel = new JPanel(new GridLayout(5, 2, 20, 20));
+        panel.setBackground(SolumBaseGUI.BACKGROUND);
+        panel.setBorder(BorderFactory.createEmptyBorder(50, 200, 50, 200));
+
+        // Username
+        panel.add(createLabel("Username:"));
+        usernameLabel = createValueLabel("");
         panel.add(usernameLabel);
 
-        panel.add(new JLabel("Height (in):"));
-        heightField = new JTextField();
-        panel.add(heightField);
-        
-        panel.add(new JLabel("Weight (lbs):"));
-        weightField = new JTextField();
-        panel.add(weightField);
+        // Height dropdown
+        panel.add(createLabel("Height (in):"));
+        heightBox = new JComboBox<>(createNumberRange(48, 84));
+        styleComponent(heightBox);
+        panel.add(heightBox);
 
-        panel.add(new JLabel("Goal:"));
-        goalBox = new JComboBox<>(new String[]{ "WEIGHT_LOSS", "MUSCLE_GAIN", "MAINTENANCE" });
+        // Weight dropdown (70–400)
+        panel.add(createLabel("Weight (lbs):"));
+        weightBox = new JComboBox<>(createNumberRange(70, 400));
+        styleComponent(weightBox);
+        panel.add(weightBox);
+
+        // Goal
+        panel.add(createLabel("Goal:"));
+        goalBox = new JComboBox<>(new String[]{
+                "WEIGHT_LOSS", "MUSCLE_GAIN", "MAINTENANCE"
+        });
+        styleComponent(goalBox);
         panel.add(goalBox);
 
+        add(panel, BorderLayout.CENTER);
+
+        // 🔥 BUTTONS
         saveButton = new JButton("Save Changes");
-        cancelButton = new JButton("Cancel");
+        cancelButton = new JButton("Back");
 
-        panel.add(saveButton);
-        panel.add(cancelButton);
+        styleButton(saveButton);
+        styleButton(cancelButton);
 
-        add(panel);
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setBackground(SolumBaseGUI.BACKGROUND);
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 40, 0));
+
+        buttonPanel.add(saveButton);
+        buttonPanel.add(cancelButton);
+
+        add(buttonPanel, BorderLayout.SOUTH);
     }
+
+    // ---------- UI HELPERS ----------
+
+    private JLabel createLabel(String text) {
+        JLabel label = new JLabel(text);
+        label.setFont(SolumBaseGUI.TEXT_FONT);
+        label.setForeground(SolumBaseGUI.NEON_PURPLE);
+        return label;
+    }
+
+    private JLabel createValueLabel(String text) {
+        JLabel label = new JLabel(text);
+        label.setFont(SolumBaseGUI.TEXT_FONT);
+        label.setForeground(SolumBaseGUI.WHITE);
+        return label;
+    }
+
+    private void styleComponent(JComponent component) {
+        component.setFont(SolumBaseGUI.TEXT_FONT);
+        component.setBackground(SolumBaseGUI.FIELD_BACKGROUND);
+        component.setForeground(SolumBaseGUI.WHITE);
+        component.setBorder(BorderFactory.createLineBorder(SolumBaseGUI.NEON_PURPLE, 1));
+        component.setPreferredSize(new Dimension(250, 40));
+
+        if (component instanceof JComboBox<?> box) {
+            box.setFocusable(false);
+            box.setMaximumRowCount(10);
+        }
+    }
+
+    private void styleButton(JButton button) {
+        button.setFont(SolumBaseGUI.BUTTON_FONT);
+        button.setBackground(SolumBaseGUI.BUTTON_BACKGROUND);
+        button.setForeground(SolumBaseGUI.NEON_PURPLE);
+        button.setFocusPainted(false);
+        button.setBorder(BorderFactory.createLineBorder(SolumBaseGUI.NEON_PURPLE, 2));
+        button.setPreferredSize(new Dimension(250, 50));
+
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(SolumBaseGUI.BUTTON_HOVER);
+                button.setBorder(BorderFactory.createLineBorder(SolumBaseGUI.GLOW_STRONG, 3));
+            }
+
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(SolumBaseGUI.BUTTON_BACKGROUND);
+                button.setBorder(BorderFactory.createLineBorder(SolumBaseGUI.NEON_PURPLE, 2));
+            }
+        });
+    }
+
+    private Integer[] createNumberRange(int start, int end) {
+        Integer[] nums = new Integer[end - start + 1];
+        for (int i = start; i <= end; i++) {
+            nums[i - start] = i;
+        }
+        return nums;
+    }
+
+    // ---------- DATA METHODS ----------
 
     public void setProfileData(UserProfile user) {
         usernameLabel.setText(user.getUsername());
-        heightField.setText(String.valueOf(user.getHeight()));
-        weightField.setText(String.valueOf(user.getWeight()));
+        heightBox.setSelectedItem(user.getHeight());
+        weightBox.setSelectedItem(user.getWeight());
         goalBox.setSelectedItem(user.getGoal().name());
     }
 
-    public String getHeightInput() { return heightField.getText().trim(); }
-    public String getWeightInput() { return weightField.getText().trim(); }
-    public String getGoalInput() { return (String) goalBox.getSelectedItem(); }
+    public String getHeightInput() {
+        return heightBox.getSelectedItem().toString();
+    }
 
-    public void addSaveListener(ActionListener listener) { saveButton.addActionListener(listener); }
-    public void addCancelListener(ActionListener listener) { cancelButton.addActionListener(listener); }
+    public String getWeightInput() {
+        return weightBox.getSelectedItem().toString();
+    }
 
-    public void showMessage(String msg) { JOptionPane.showMessageDialog(this, msg); }
-    public void showError(String msg) { JOptionPane.showMessageDialog(this, msg, "Error", JOptionPane.ERROR_MESSAGE); }
+    public String getGoalInput() {
+        return (String) goalBox.getSelectedItem();
+    }
+
+    public void addSaveListener(ActionListener listener) {
+        saveButton.addActionListener(listener);
+    }
+
+    public void addCancelListener(ActionListener listener) {
+        cancelButton.addActionListener(listener);
+    }
+
+    public void showMessage(String msg) {
+        JOptionPane.showMessageDialog(this, msg);
+    }
+
+    public void showError(String msg) {
+        JOptionPane.showMessageDialog(this, msg, "Error", JOptionPane.ERROR_MESSAGE);
+    }
 }
