@@ -34,7 +34,7 @@ public class EditProfileScreen extends JFrame {
         panel.add(weightField);
 
         panel.add(new JLabel("Goal:"));
-        goalBox = new JComboBox<>(new String[]{ "WEIGHT_LOSS", "MUSCLE_GAIN", "MAINTENANCE" });
+        goalBox = new JComboBox<>(new String[]{ "WEIGHT_LOSS", "WEIGHT_GAIN", "MAINTENANCE" });
         panel.add(goalBox);
 
         saveButton = new JButton("Save Changes");

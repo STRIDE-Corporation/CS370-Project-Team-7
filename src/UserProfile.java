@@ -10,7 +10,7 @@ public class UserProfile {
 
     public enum Goal {
         WEIGHT_LOSS,
-        MUSCLE_GAIN,
+        WEIGHT_GAIN,
         MAINTENANCE
     }
 

@@ -65,7 +65,8 @@ public class LogWorkoutController {
                 }
 
                 if (!workoutStarted) {
-                    currentWorkout = workoutManager.addWorkout(currentUser.getUsername());
+                    String notes = view.getNotes();
+                    currentWorkout = workoutManager.addWorkout(currentUser.getUsername(), notes);
 
                     if (currentWorkout == null) {
                         view.showError("Failed to create workout.");

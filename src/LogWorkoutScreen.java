@@ -11,6 +11,7 @@ public class LogWorkoutScreen extends JFrame {
     private JTextField caloriesField;
 
     private JTextArea exerciseListArea;
+    private JTextArea notesArea;
 
     private JButton addExerciseButton;
     private JButton finishWorkoutButton;
@@ -24,7 +25,7 @@ public class LogWorkoutScreen extends JFrame {
         setLayout(new BorderLayout(10, 10));
         getContentPane().setBackground(SolumBaseGUI.BACKGROUND);
 
-        JPanel inputPanel = new JPanel(new GridLayout(6, 2, 12, 12));
+        JPanel inputPanel = new JPanel(new GridLayout(7, 2, 12, 12));
         inputPanel.setBackground(SolumBaseGUI.BACKGROUND);
         inputPanel.setBorder(BorderFactory.createEmptyBorder(25, 35, 15, 35));
 
@@ -54,6 +55,18 @@ public class LogWorkoutScreen extends JFrame {
 
         inputPanel.add(createLabel("Calories Burned:"));
         inputPanel.add(caloriesField);
+
+        notesArea = new JTextArea(3, 20);
+        notesArea.setFont(SolumBaseGUI.TEXT_FONT);
+        notesArea.setBackground(SolumBaseGUI.FIELD_BACKGROUND);
+        notesArea.setForeground(SolumBaseGUI.WHITE);
+        notesArea.setCaretColor(SolumBaseGUI.WHITE);
+        notesArea.setBorder(BorderFactory.createLineBorder(SolumBaseGUI.NEON_PURPLE, 1));
+
+        JScrollPane notesScroll = new JScrollPane(notesArea);
+
+        inputPanel.add(createLabel("Workout Notes:"));
+        inputPanel.add(notesScroll);
 
         addExerciseButton = new JButton("Add Exercise");
         finishWorkoutButton = new JButton("Finish Workout");
@@ -141,6 +154,8 @@ public class LogWorkoutScreen extends JFrame {
     }
 
     public String getCaloriesBurned() { return caloriesField.getText().trim(); }
+
+    public String getNotes() { return notesArea.getText().trim(); }
 
     public void clearExerciseFields() {
         durationField.setText("");

@@ -42,7 +42,7 @@ public class RegisterScreen extends JFrame {
 
         goalBox = new JComboBox<>(new String[]{
                 "WEIGHT_LOSS",
-                "MUSCLE_GAIN",
+                "WEIGHT_GAIN",
                 "MAINTENANCE"
         });
         goalBox.setFont(SolumBaseGUI.TEXT_FONT);
