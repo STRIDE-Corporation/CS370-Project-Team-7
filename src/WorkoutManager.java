@@ -1,5 +1,7 @@
 import java.sql.*;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import org.jfree.data.category.DefaultCategoryDataset;
 
 public class WorkoutManager {
@@ -66,7 +68,7 @@ public class WorkoutManager {
         String sql = """
             UPDATE workouts
             SET duration = (
-                SELECT SUM(duration)
+                SELECT COALESCE(SUM(duration), 0)
                 FROM exercise_entries
                 WHERE workout_id = ?
             )
@@ -89,7 +91,7 @@ public class WorkoutManager {
         String sql = """
             UPDATE workouts
             SET calories_burned = (
-                SELECT SUM(calories_burned)
+                SELECT COALESCE(SUM(calories_burned), 0)
                 FROM exercise_entries
                 WHERE workout_id = ?
             )
@@ -108,118 +110,63 @@ public class WorkoutManager {
         }
     }
 
-    public String getUserWorkoutHistory(String username) {
-        StringBuilder history = new StringBuilder();
+    public boolean deleteWorkout(int workoutId, String username) {
+        String checkSql = "SELECT workout_id FROM workouts WHERE workout_id = ? AND username = ?";
+        String deleteExercisesSql = "DELETE FROM exercise_entries WHERE workout_id = ?";
+        String deleteWorkoutSql = "DELETE FROM workouts WHERE workout_id = ? AND username = ?";
 
-        String workoutSql = "SELECT * FROM workouts WHERE username = ?";
-        String exerciseSql = "SELECT * FROM exercise_entries WHERE workout_id = ?";
+        try (Connection conn = db.connect()) {
+            conn.setAutoCommit(false);
 
-        try (Connection conn = db.connect();
-             PreparedStatement workoutStmt = conn.prepareStatement(workoutSql)) {
+            try (
+                    PreparedStatement checkStmt = conn.prepareStatement(checkSql);
+                    PreparedStatement deleteExercisesStmt = conn.prepareStatement(deleteExercisesSql);
+                    PreparedStatement deleteWorkoutStmt = conn.prepareStatement(deleteWorkoutSql)
+            ) {
+                checkStmt.setInt(1, workoutId);
+                checkStmt.setString(2, username);
 
-            workoutStmt.setString(1, username);
-            ResultSet workoutRs = workoutStmt.executeQuery();
+                ResultSet rs = checkStmt.executeQuery();
 
-            boolean found = false;
-
-            while (workoutRs.next()) {
-                found = true;
-
-                int workoutId = workoutRs.getInt("workout_id");
-                String dateTime = workoutRs.getString("workout_datetime");
-                int duration = workoutRs.getInt("duration");
-                int caloriesBurned = workoutRs.getInt("calories_burned");
-                String notes = workoutRs.getString("notes");
-
-                history.append("Workout ID: ").append(workoutId).append("\n");
-                history.append("Date: ").append(dateTime).append("\n");
-                history.append("Total Duration: ").append(duration).append(" minutes\n");
-                history.append("Estimated Total Calories Burned: ").append(caloriesBurned).append("\n");
-
-                if (notes == null || notes.trim().isEmpty()) {
-                    history.append("Notes: None\n");
-                } else {
-                    history.append("Notes:\n").append(formatNotes(notes)).append("\n");
+                if (!rs.next()) {
+                    conn.rollback();
+                    return false;
                 }
 
-                history.append("Exercises:\n");
+                deleteExercisesStmt.setInt(1, workoutId);
+                deleteExercisesStmt.executeUpdate();
 
-                try (PreparedStatement exerciseStmt = conn.prepareStatement(exerciseSql)) {
-                    exerciseStmt.setInt(1, workoutId);
-                    ResultSet exerciseRs = exerciseStmt.executeQuery();
+                deleteWorkoutStmt.setInt(1, workoutId);
+                deleteWorkoutStmt.setString(2, username);
 
-                    boolean hasExercises = false;
+                int rows = deleteWorkoutStmt.executeUpdate();
 
-                    while (exerciseRs.next()) {
-                        hasExercises = true;
+                conn.commit();
+                return rows > 0;
 
-                        ExerciseEntry entry = new ExerciseEntry(
-                                exerciseRs.getInt("exercise_entry_id"),
-                                exerciseRs.getString("exercise_name"),
-                                exerciseRs.getInt("sets"),
-                                exerciseRs.getInt("reps"),
-                                exerciseRs.getInt("duration"),
-                                exerciseRs.getInt("calories_burned")
-                        );
-
-                        history.append("  Exercise: ").append(entry.getExerciseName()).append("\n");
-                        history.append("  Sets: ").append(entry.getSets()).append("\n");
-                        history.append("  Reps: ").append(entry.getReps()).append("\n");
-                        history.append("  Duration: ").append(entry.getDuration()).append(" minutes\n");
-                        history.append("  Estimated Calories Burned: ").append(entry.getCaloriesBurned()).append("\n");
-                        history.append("  -------------------\n");
-                    }
-
-                    if (!hasExercises) {
-                        history.append("  No exercises recorded.\n");
-                    }
-                }
-
-                history.append("=======================\n\n");
-            }
-
-            if (!found) {
-                return "No workouts found for this user.";
+            } catch (SQLException e) {
+                conn.rollback();
+                e.printStackTrace();
+                return false;
+            } finally {
+                conn.setAutoCommit(true);
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
-            return "Error loading workout history.";
+            return false;
         }
-
-        return history.toString();
     }
 
-    private String formatNotes(String notes) {
-        String[] lines = notes.split("\\R");
-        StringBuilder formattedNotes = new StringBuilder();
-
-        for (String line : lines) {
-            String trimmed = line.trim();
-
-            if (trimmed.isEmpty()) {
-                continue;
-            }
-
-            if (trimmed.startsWith("-")) {
-                formattedNotes.append(trimmed).append("\n");
-            } else {
-                formattedNotes.append("- ").append(trimmed).append("\n");
-            }
-        }
-
-        return formattedNotes.toString();
-    }
-
-    public DefaultCategoryDataset getUserCaloriesDataset(String username) {
+    public DefaultCategoryDataset getCaloriesDataset(String username) {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
         String sql = """
-        SELECT workout_id, workout_datetime, calories_burned
-        FROM workouts
-        WHERE username = ?
-        ORDER BY workout_datetime ASC
-        """;
+            SELECT workout_id, calories_burned
+            FROM workouts
+            WHERE username = ?
+            ORDER BY workout_datetime ASC
+            """;
 
         try (Connection conn = db.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -228,13 +175,10 @@ public class WorkoutManager {
             ResultSet rs = pstmt.executeQuery();
 
             while (rs.next()) {
-                int workoutId = rs.getInt("workout_id");
-                int caloriesBurned = rs.getInt("calories_burned");
-
                 dataset.addValue(
-                        caloriesBurned,
-                        "Estimated Calories Burned",
-                        "Workout " + workoutId
+                        rs.getInt("calories_burned"),
+                        "Calories",
+                        "Workout " + rs.getInt("workout_id")
                 );
             }
 
@@ -265,34 +209,14 @@ public class WorkoutManager {
         return 0;
     }
 
-    public double getAverageCaloriesBurned(String username) {
-        String sql = "SELECT AVG(calories_burned) AS avg_calories FROM workouts WHERE username = ?";
-
-        try (Connection conn = db.connect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setString(1, username);
-            ResultSet rs = pstmt.executeQuery();
-
-            if (rs.next()) {
-                return rs.getDouble("avg_calories");
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return 0;
-    }
-
     public double getRecentAverageCaloriesBurned(String username, int limit) {
         String sql = """
-        SELECT calories_burned
-        FROM workouts
-        WHERE username = ?
-        ORDER BY workout_datetime DESC
-        LIMIT ?
-    """;
+            SELECT calories_burned
+            FROM workouts
+            WHERE username = ?
+            ORDER BY workout_datetime DESC
+            LIMIT ?
+            """;
 
         try (Connection conn = db.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -325,12 +249,12 @@ public class WorkoutManager {
 
     public int getCalorieTrend(String username) {
         String sql = """
-        SELECT calories_burned
-        FROM workouts
-        WHERE username = ?
-        ORDER BY workout_datetime DESC
-        LIMIT 5
-    """;
+            SELECT calories_burned
+            FROM workouts
+            WHERE username = ?
+            ORDER BY workout_datetime DESC
+            LIMIT 5
+            """;
 
         try (Connection conn = db.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -364,12 +288,12 @@ public class WorkoutManager {
 
     public int getLatestWorkoutCalories(String username) {
         String sql = """
-        SELECT calories_burned
-        FROM workouts
-        WHERE username = ?
-        ORDER BY workout_datetime DESC
-        LIMIT 1
-    """;
+            SELECT calories_burned
+            FROM workouts
+            WHERE username = ?
+            ORDER BY workout_datetime DESC
+            LIMIT 1
+            """;
 
         try (Connection conn = db.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -386,39 +310,6 @@ public class WorkoutManager {
         }
 
         return -1;
-    }
-
-    public boolean isImproving(String username) {
-        String sql = """
-        SELECT calories_burned
-        FROM workouts
-        WHERE username = ?
-        ORDER BY workout_datetime DESC
-        LIMIT 3
-    """;
-
-        try (Connection conn = db.connect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setString(1, username);
-            ResultSet rs = pstmt.executeQuery();
-
-            int[] last = new int[3];
-            int i = 0;
-
-            while (rs.next() && i < 3) {
-                last[i++] = rs.getInt("calories_burned");
-            }
-
-            if (i < 3) return false;
-
-            return last[0] > last[1] && last[1] > last[2];
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return false;
     }
 
     public int getProjectedCalories(String username, UserProfile.Goal goal) {
@@ -469,51 +360,115 @@ public class WorkoutManager {
         return (int) Math.round(projection);
     }
 
-    public boolean deleteWorkout(int workoutId, String username) {
-        String checkSql = "SELECT workout_id FROM workouts WHERE workout_id = ? AND username = ?";
-        String deleteExercisesSql = "DELETE FROM exercise_entries WHERE workout_id = ?";
-        String deleteWorkoutSql = "DELETE FROM workouts WHERE workout_id = ? AND username = ?";
+    public String getUserWorkoutHistory(String username) {
+        StringBuilder history = new StringBuilder();
 
-        try (Connection conn = db.connect()) {
-            conn.setAutoCommit(false);
+        String workoutSql = "SELECT * FROM workouts WHERE username = ?";
+        String exerciseSql = "SELECT * FROM exercise_entries WHERE workout_id = ?";
 
-            try (
-                    PreparedStatement checkStmt = conn.prepareStatement(checkSql);
-                    PreparedStatement deleteExercisesStmt = conn.prepareStatement(deleteExercisesSql);
-                    PreparedStatement deleteWorkoutStmt = conn.prepareStatement(deleteWorkoutSql)
-            ) {
-                checkStmt.setInt(1, workoutId);
-                checkStmt.setString(2, username);
+        try (Connection conn = db.connect();
+             PreparedStatement workoutStmt = conn.prepareStatement(workoutSql)) {
 
-                ResultSet rs = checkStmt.executeQuery();
+            workoutStmt.setString(1, username);
+            ResultSet workoutRs = workoutStmt.executeQuery();
 
-                if (!rs.next()) {
-                    conn.rollback();
-                    return false;
+            boolean first = true;
+
+            while (workoutRs.next()) {
+
+                if (!first) {
+                    history.append("\n\n");
                 }
+                first = false;
 
-                deleteExercisesStmt.setInt(1, workoutId);
-                deleteExercisesStmt.executeUpdate();
+                int workoutId = workoutRs.getInt("workout_id");
+                String dateTime = workoutRs.getString("workout_datetime");
+                int duration = workoutRs.getInt("duration");
+                int calories = workoutRs.getInt("calories_burned");
+                String notes = workoutRs.getString("notes");
 
-                deleteWorkoutStmt.setInt(1, workoutId);
-                deleteWorkoutStmt.setString(2, username);
+                history.append("Workout ID: ").append(workoutId).append("\n");
+                history.append("Date: ").append(formatWorkoutDate(dateTime)).append("\n");
+                history.append("Total Duration: ").append(duration).append(" minutes\n");
+                history.append("Estimated Total Calories Burned: ").append(calories).append("\n\n");
 
-                int rowsAffected = deleteWorkoutStmt.executeUpdate();
+                history.append("Notes:\n")
+                        .append(formatNotes(notes))
+                        .append("\n");
 
-                conn.commit();
-                return rowsAffected > 0;
+                history.append("Exercises:\n");
 
-            } catch (SQLException e) {
-                conn.rollback();
-                e.printStackTrace();
-                return false;
-            } finally {
-                conn.setAutoCommit(true);
+                try (PreparedStatement exStmt = conn.prepareStatement(exerciseSql)) {
+                    exStmt.setInt(1, workoutId);
+                    ResultSet exRs = exStmt.executeQuery();
+
+                    while (exRs.next()) {
+                        history.append("  Exercise: ").append(exRs.getString("exercise_name")).append("\n");
+                        history.append("  Sets: ").append(exRs.getInt("sets")).append("\n");
+                        history.append("  Reps: ").append(exRs.getInt("reps")).append("\n");
+                        history.append("  Duration: ").append(exRs.getInt("duration")).append(" minutes\n");
+                        history.append("  Estimated Calories Burned: ").append(exRs.getInt("calories_burned")).append("\n\n");
+                    }
+                }
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
         }
+
+        return history.toString();
+    }
+
+    private String formatWorkoutDate(String dateTimeText) {
+        try {
+            LocalDateTime dt = LocalDateTime.parse(dateTimeText);
+
+            String month = dt.getMonth().getDisplayName(java.time.format.TextStyle.FULL, Locale.ENGLISH);
+            int day = dt.getDayOfMonth();
+            int year = dt.getYear();
+
+            String time = dt.format(DateTimeFormatter.ofPattern("h:mm a"));
+
+            return month + " " + day + getDaySuffix(day) + ", " + year + " at " + time + " PST";
+
+        } catch (Exception e) {
+            return dateTimeText;
+        }
+    }
+
+    private String getDaySuffix(int day) {
+        if (day >= 11 && day <= 13) return "th";
+
+        return switch (day % 10) {
+            case 1 -> "st";
+            case 2 -> "nd";
+            case 3 -> "rd";
+            default -> "th";
+        };
+    }
+
+    private String formatNotes(String notes) {
+        if (notes == null || notes.trim().isEmpty()) {
+            return "- None";
+        }
+
+        String[] lines = notes.split("\\R");
+        StringBuilder formatted = new StringBuilder();
+
+        for (String line : lines) {
+            String trimmed = line.trim();
+
+            if (trimmed.isEmpty()) {
+                continue;
+            }
+
+            if (trimmed.startsWith("-")) {
+                formatted.append(trimmed).append("\n");
+            } else {
+                formatted.append("- ").append(trimmed).append("\n");
+            }
+        }
+
+        return formatted.toString();
     }
 }

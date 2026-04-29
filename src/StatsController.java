@@ -1,18 +1,18 @@
+import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
-import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.ValueMarker;
 import org.jfree.chart.renderer.category.BarRenderer;
+import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.ui.Layer;
 import org.jfree.ui.RectangleAnchor;
 import org.jfree.ui.TextAnchor;
-
-import java.awt.BasicStroke;
-import java.awt.Color;
 
 public class StatsController {
 
@@ -38,9 +38,8 @@ public class StatsController {
     }
 
     private ChartPanel createChart() {
-
         DefaultCategoryDataset dataset =
-                workoutManager.getUserCaloriesDataset(currentUser.getUsername());
+                workoutManager.getCaloriesDataset(currentUser.getUsername());
 
         int projectedCalories = workoutManager.getProjectedCalories(
                 currentUser.getUsername(),
@@ -56,7 +55,7 @@ public class StatsController {
         }
 
         JFreeChart chart = ChartFactory.createBarChart(
-                "Calories Burned",
+                "Estimated Calories Burned",
                 "Workout",
                 "Calories",
                 dataset,
@@ -67,7 +66,6 @@ public class StatsController {
         );
 
         CategoryPlot plot = chart.getCategoryPlot();
-
         plot.setBackgroundPaint(new Color(35, 35, 40));
         plot.setRangeGridlinePaint(new Color(90, 90, 95));
 
@@ -79,40 +77,32 @@ public class StatsController {
             int minTarget = (int) Math.round(projectedCalories * 0.9);
             int maxTarget = (int) Math.round(projectedCalories * 1.1);
 
-            ValueMarker minMarker = new ValueMarker(minTarget);
-            minMarker.setPaint(new Color(0, 220, 160));
-            minMarker.setStroke(new BasicStroke(
-                    2.5f,
-                    BasicStroke.CAP_ROUND,
-                    BasicStroke.JOIN_ROUND,
-                    1.0f,
-                    new float[]{10.0f, 6.0f},
-                    0.0f
-            ));
-            minMarker.setLabel("Min Target (" + minTarget + ")");
-            minMarker.setLabelPaint(new Color(0, 220, 160));
-            minMarker.setLabelAnchor(RectangleAnchor.RIGHT);
-            minMarker.setLabelTextAnchor(TextAnchor.CENTER_RIGHT);
-            plot.addRangeMarker(minMarker, Layer.FOREGROUND);
-
-            ValueMarker maxMarker = new ValueMarker(maxTarget);
-            maxMarker.setPaint(new Color(0, 220, 160));
-            maxMarker.setStroke(new BasicStroke(
-                    2.5f,
-                    BasicStroke.CAP_ROUND,
-                    BasicStroke.JOIN_ROUND,
-                    1.0f,
-                    new float[]{10.0f, 6.0f},
-                    0.0f
-            ));
-            maxMarker.setLabel("Max Target (" + maxTarget + ")");
-            maxMarker.setLabelPaint(new Color(0, 220, 160));
-            maxMarker.setLabelAnchor(RectangleAnchor.RIGHT);
-            maxMarker.setLabelTextAnchor(TextAnchor.CENTER_RIGHT);
-            plot.addRangeMarker(maxMarker, Layer.FOREGROUND);
+            addTargetMarker(plot, minTarget, "Min Target (" + minTarget + ")");
+            addTargetMarker(plot, maxTarget, "Max Target (" + maxTarget + ")");
         }
 
         return new ChartPanel(chart);
+    }
+
+    private void addTargetMarker(CategoryPlot plot, int value, String label) {
+        ValueMarker marker = new ValueMarker(value);
+
+        marker.setPaint(new Color(0, 220, 160));
+        marker.setStroke(new BasicStroke(
+                2.5f,
+                BasicStroke.CAP_ROUND,
+                BasicStroke.JOIN_ROUND,
+                1.0f,
+                new float[]{10.0f, 6.0f},
+                0.0f
+        ));
+
+        marker.setLabel(label);
+        marker.setLabelPaint(new Color(0, 220, 160));
+        marker.setLabelAnchor(RectangleAnchor.RIGHT);
+        marker.setLabelTextAnchor(TextAnchor.CENTER_RIGHT);
+
+        plot.addRangeMarker(marker, Layer.FOREGROUND);
     }
 
     private void setPersonalizedInsight() {
