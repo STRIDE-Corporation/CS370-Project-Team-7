@@ -18,6 +18,7 @@ public class DashboardController {
         this.workoutManager = workoutManager;
         this.accountManager = accountManager;
 
+        this.dashboardView.setRefreshAction(this::refreshDashboardStats);
         refreshDashboardStats();
 
         this.dashboardView.addLogoutListener(new LogoutListener());

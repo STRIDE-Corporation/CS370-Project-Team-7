@@ -92,6 +92,17 @@ public class SolumBaseGUI {
         return result == JOptionPane.YES_OPTION;
     }
 
+    public static String showInput(Component parent, String message, String title) {
+        applyPopupTheme();
+
+        return JOptionPane.showInputDialog(
+                parent,
+                message,
+                title,
+                JOptionPane.QUESTION_MESSAGE
+        );
+    }
+
     private static void showThemedDialog(Component parent, String title, String message, int type) {
         applyPopupTheme();
         JOptionPane.showMessageDialog(parent, message, title, type);

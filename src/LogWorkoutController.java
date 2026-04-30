@@ -26,6 +26,11 @@ public class LogWorkoutController {
         this.view.addBackListener(new BackListener());
     }
 
+    private void returnToDashboard() {
+        dashboardView.setVisible(true);
+        view.dispose();
+    }
+
     private class AddExerciseListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -133,16 +138,14 @@ public class LogWorkoutController {
             }
 
             view.showMessage("Workout saved successfully!");
-            dashboardView.setVisible(true);
-            view.dispose();
+            returnToDashboard();
         }
     }
 
     private class BackListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            dashboardView.setVisible(true);
-            view.dispose();
+            returnToDashboard();
         }
     }
 }

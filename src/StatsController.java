@@ -44,7 +44,6 @@ public class StatsController {
     }
 
     private ChartPanel createChart() {
-
         DefaultCategoryDataset original =
                 workoutManager.getCaloriesDataset(currentUser.getUsername());
 
@@ -105,7 +104,6 @@ public class StatsController {
         renderer.setSeriesPaint(0, workoutGradient);
         renderer.setSeriesPaint(1, projectionGradient);
 
-        // Glow edges
         renderer.setDrawBarOutline(true);
         renderer.setSeriesOutlinePaint(0, new Color(230, 190, 255));
         renderer.setSeriesOutlineStroke(0, new BasicStroke(2.5f));
@@ -114,7 +112,6 @@ public class StatsController {
         renderer.setSeriesOutlineStroke(1, new BasicStroke(3.5f));
 
         renderer.setShadowVisible(false);
-
         renderer.setItemMargin(0.05);
         renderer.setMaximumBarWidth(0.075);
 
@@ -256,6 +253,7 @@ public class StatsController {
         int latestCalories = workoutManager.getLatestWorkoutCalories(currentUser.getUsername());
 
         String analysis;
+
         if (latestCalories < minTarget) {
             analysis = "Below range. Increase intensity.";
         } else if (latestCalories > maxTarget) {
@@ -272,6 +270,7 @@ public class StatsController {
     }
 
     private class BackListener implements ActionListener {
+        @Override
         public void actionPerformed(ActionEvent e) {
             dashboardView.setVisible(true);
             view.dispose();

@@ -15,6 +15,8 @@ public class MainDashBoard extends JFrame {
     private JLabel totalMinutesLabel;
     private JLabel lastWorkoutCaloriesLabel;
 
+    private Runnable refreshAction;
+
     public MainDashBoard(String username) {
         setTitle("Dashboard");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -87,14 +89,20 @@ public class MainDashBoard extends JFrame {
         add(footerPanel, BorderLayout.SOUTH);
     }
 
+    @Override
+    public void setVisible(boolean visible) {
+        if (visible && refreshAction != null) {
+            refreshAction.run();
+        }
+        super.setVisible(visible);
+    }
+
+    public void setRefreshAction(Runnable refreshAction) {
+        this.refreshAction = refreshAction;
+    }
+
     private JLabel createStatCard(String title, String value) {
-        JLabel label = new JLabel(
-                "<html><div style='text-align:center;'>"
-                        + "<span style='font-size:11px;'>" + title + "</span><br>"
-                        + "<span style='font-size:18px;'>" + value + "</span>"
-                        + "</div></html>",
-                SwingConstants.CENTER
-        );
+        JLabel label = new JLabel(formatStatCard(title, value), SwingConstants.CENTER);
 
         label.setFont(SolumBaseGUI.TEXT_FONT.deriveFont(Font.BOLD, 16f));
         label.setForeground(SolumBaseGUI.NEON_PURPLE);
