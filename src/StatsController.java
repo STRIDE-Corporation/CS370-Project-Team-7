@@ -50,11 +50,12 @@ public class StatsController {
 
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
+        // ✅ FIXED GENERICS WARNING HERE
         for (int r = 0; r < original.getRowCount(); r++) {
-            Comparable rowKey = original.getRowKey(r);
+            Comparable<?> rowKey = original.getRowKey(r);
 
             for (int c = 0; c < original.getColumnCount(); c++) {
-                Comparable colKey = original.getColumnKey(c);
+                Comparable<?> colKey = original.getColumnKey(c);
 
                 if (!colKey.toString().equalsIgnoreCase("Next Workout")
                         && !colKey.toString().equalsIgnoreCase("Projection")) {
@@ -92,11 +93,13 @@ public class StatsController {
         CategoryPlot plot = chart.getCategoryPlot();
         BarRenderer renderer = (BarRenderer) plot.getRenderer();
 
+        // 🔥 PURPLE GLOW (workouts)
         GradientPaint workoutGradient = new GradientPaint(
                 0f, 0f, SolumBaseGUI.GLOW_STRONG,
                 0f, 180f, SolumBaseGUI.NEON_PURPLE
         );
 
+        // 🔥 BLUE PROJECTION
         GradientPaint projectionGradient = new GradientPaint(
                 0f, 0f, new Color(90, 210, 255),
                 0f, 180f, new Color(5, 70, 190)
@@ -105,25 +108,26 @@ public class StatsController {
         renderer.setSeriesPaint(0, workoutGradient);
         renderer.setSeriesPaint(1, projectionGradient);
 
+        // Glow edges
         renderer.setDrawBarOutline(true);
         renderer.setSeriesOutlinePaint(0, new Color(230, 190, 255));
-        renderer.setSeriesOutlineStroke(0, new BasicStroke(2.2f));
+        renderer.setSeriesOutlineStroke(0, new BasicStroke(2.5f));
 
         renderer.setSeriesOutlinePaint(1, new Color(150, 230, 255));
-        renderer.setSeriesOutlineStroke(1, new BasicStroke(3.2f));
+        renderer.setSeriesOutlineStroke(1, new BasicStroke(3.5f));
 
-        // Removes the fake bar behind each column
+        // ❌ REMOVE SHADOW BAR (your issue earlier)
         renderer.setShadowVisible(false);
 
-        renderer.setItemMargin(0.06);
+        renderer.setItemMargin(0.05);
         renderer.setMaximumBarWidth(0.075);
 
         applyCustomLegend(plot);
 
+        // 🔥 TARGET RANGE BAND
         if (projectedCalories != -1) {
             int minTarget = (int) Math.round(projectedCalories * 0.9);
             int maxTarget = (int) Math.round(projectedCalories * 1.1);
-
             addTargetRangeBand(plot, minTarget, maxTarget);
         }
 
@@ -141,7 +145,7 @@ public class StatsController {
 
         legendItems.add(new LegendItem(
                 "Actual Calories",
-                "Calories burned in logged workouts",
+                "Calories burned in workouts",
                 null,
                 null,
                 box,
@@ -150,7 +154,7 @@ public class StatsController {
 
         legendItems.add(new LegendItem(
                 "Next Workout Projection",
-                "Projected calorie target for your next workout",
+                "Your target for next workout",
                 null,
                 null,
                 box,
@@ -159,7 +163,7 @@ public class StatsController {
 
         legendItems.add(new LegendItem(
                 "Target Range",
-                "Recommended minimum and maximum calorie range",
+                "Recommended range",
                 null,
                 null,
                 box,
@@ -213,7 +217,6 @@ public class StatsController {
         band.setOutlinePaint(new Color(0, 220, 160));
         band.setOutlineStroke(new BasicStroke(2.0f));
 
-        // Behind the bars so it looks like a clean target zone
         plot.addRangeMarker(band, Layer.BACKGROUND);
     }
 
@@ -243,9 +246,8 @@ public class StatsController {
         int workoutCount = workoutManager.getWorkoutCount(currentUser.getUsername());
 
         if (workoutCount < 3) {
-            return "Plan locked\n\n" +
-                    "Log at least 3 workouts to unlock your personalized plan.\n\n" +
-                    "Current progress: " + workoutCount + "/3 workouts";
+            return "Plan locked\n\nLog at least 3 workouts to unlock.\n\nProgress: "
+                    + workoutCount + "/3 workouts";
         }
 
         int projectedCalories = workoutManager.getProjectedCalories(
@@ -259,43 +261,22 @@ public class StatsController {
         int latestCalories = workoutManager.getLatestWorkoutCalories(currentUser.getUsername());
 
         String analysis;
-
         if (latestCalories < minTarget) {
-            analysis = "Your latest workout was " + latestCalories +
-                    " calories, which was below your target range. Try increasing duration or intensity next time.";
+            analysis = "Below range. Increase intensity.";
         } else if (latestCalories > maxTarget) {
-            analysis = "Your latest workout was " + latestCalories +
-                    " calories, which was above your target range. Great effort, but make sure recovery stays balanced.";
+            analysis = "Above range. Balance recovery.";
         } else {
-            analysis = "Your latest workout was " + latestCalories +
-                    " calories, which landed inside your target range. Keep this pace.";
-        }
-
-        String recommend;
-
-        if (latestCalories < minTarget) {
-            recommend = "Increase your calorie burn next workout toward at least " + minTarget + ".";
-        } else if (latestCalories > maxTarget) {
-            recommend = "Reduce your calorie burn slightly toward " + projectedCalories + " to stay in range.";
-        } else {
-            recommend = "Stay within your current range of " + minTarget + " - " + maxTarget + " calories.";
+            analysis = "Good job. Stay consistent.";
         }
 
         return "Goal: " + currentUser.getGoal().name() + "\n\n" +
-                "Latest workout analysis:\n" +
-                analysis + "\n\n" +
-                "Next workout target:\n" +
-                projectedCalories + " calories\n\n" +
-                "Target range:\n" +
-                minTarget + " - " + maxTarget + " calories\n\n" +
-                "Weekly suggestion:\n" +
-                "3 workouts, about " + weeklyGoal + " total calories\n\n" +
-                "Recommendation:\n" +
-                recommend;
+                "Latest workout analysis:\n" + analysis + "\n\n" +
+                "Next workout target:\n" + projectedCalories + " calories\n\n" +
+                "Target range:\n" + minTarget + " - " + maxTarget + "\n\n" +
+                "Weekly suggestion:\n3 workouts (~" + weeklyGoal + " calories)";
     }
 
     private class BackListener implements ActionListener {
-        @Override
         public void actionPerformed(ActionEvent e) {
             dashboardView.setVisible(true);
             view.dispose();
