@@ -135,35 +135,27 @@ public class LogWorkoutScreen extends JFrame {
         add(inputPanel, BorderLayout.NORTH);
         add(exerciseScrollPane, BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
+
+        SolumBaseGUI.styleFrame(this);
     }
 
     private void addDurationLiveUpdate() {
         durationField.getDocument().addDocumentListener(new DocumentListener() {
-            public void insertUpdate(DocumentEvent e) {
-                updateCaloriesFromDuration();
-            }
-
-            public void removeUpdate(DocumentEvent e) {
-                updateCaloriesFromDuration();
-            }
-
-            public void changedUpdate(DocumentEvent e) {
-                updateCaloriesFromDuration();
-            }
+            public void insertUpdate(DocumentEvent e) { updateCaloriesFromDuration(); }
+            public void removeUpdate(DocumentEvent e) { updateCaloriesFromDuration(); }
+            public void changedUpdate(DocumentEvent e) { updateCaloriesFromDuration(); }
         });
     }
 
     private void updateCaloriesFromDuration() {
         try {
-            String durationText = durationField.getText().trim();
-
-            if (durationText.isEmpty()) {
+            String text = durationField.getText().trim();
+            if (text.isEmpty()) {
                 setCaloriesEstimate(0);
                 return;
             }
 
-            int duration = Integer.parseInt(durationText);
-
+            int duration = Integer.parseInt(text);
             if (duration <= 0) {
                 setCaloriesEstimate(0);
                 return;
@@ -219,25 +211,12 @@ public class LogWorkoutScreen extends JFrame {
         });
     }
 
-    public String getDuration() {
-        return durationField.getText().trim();
-    }
-
-    public String getExerciseName() {
-        return exerciseNameField.getText().trim();
-    }
-
-    public String getSets() {
-        return setsField.getText().trim();
-    }
-
-    public String getReps() {
-        return repsField.getText().trim();
-    }
-
-    public String getNotes() {
-        return notesArea.getText().trim();
-    }
+    // GETTERS
+    public String getDuration() { return durationField.getText().trim(); }
+    public String getExerciseName() { return exerciseNameField.getText().trim(); }
+    public String getSets() { return setsField.getText().trim(); }
+    public String getReps() { return repsField.getText().trim(); }
+    public String getNotes() { return notesArea.getText().trim(); }
 
     public void setCaloriesEstimate(int calories) {
         caloriesEstimateLabel.setText(String.valueOf(calories));
@@ -255,23 +234,24 @@ public class LogWorkoutScreen extends JFrame {
         exerciseListArea.append(text + "\n");
     }
 
-    public void addAddExerciseListener(ActionListener listener) {
-        addExerciseButton.addActionListener(listener);
+    public void addAddExerciseListener(ActionListener l) {
+        addExerciseButton.addActionListener(l);
     }
 
-    public void addFinishWorkoutListener(ActionListener listener) {
-        finishWorkoutButton.addActionListener(listener);
+    public void addFinishWorkoutListener(ActionListener l) {
+        finishWorkoutButton.addActionListener(l);
     }
 
-    public void addBackListener(ActionListener listener) {
-        backButton.addActionListener(listener);
+    public void addBackListener(ActionListener l) {
+        backButton.addActionListener(l);
     }
 
+    // 🔥 UPDATED POPUPS
     public void showMessage(String msg) {
-        JOptionPane.showMessageDialog(this, msg);
+        SolumBaseGUI.showMessage(this, msg);
     }
 
     public void showError(String msg) {
-        JOptionPane.showMessageDialog(this, msg, "Error", JOptionPane.ERROR_MESSAGE);
+        SolumBaseGUI.showError(this, msg);
     }
 }

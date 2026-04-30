@@ -10,6 +10,11 @@ public class MainDashBoard extends JFrame {
     private JButton logoutButton;
     private JButton statsButton;
 
+    private JLabel totalWorkoutsLabel;
+    private JLabel totalCaloriesLabel;
+    private JLabel totalMinutesLabel;
+    private JLabel lastWorkoutCaloriesLabel;
+
     public MainDashBoard(String username) {
         setTitle("Dashboard");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -17,6 +22,9 @@ public class MainDashBoard extends JFrame {
         getContentPane().setBackground(SolumBaseGUI.BACKGROUND);
 
         SolumBaseGUI.styleFrameFullscreen(this);
+
+        JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.setBackground(SolumBaseGUI.BACKGROUND);
 
         JPanel headerPanel = new JPanel();
         headerPanel.setBackground(SolumBaseGUI.BUTTON_BACKGROUND);
@@ -27,21 +35,38 @@ public class MainDashBoard extends JFrame {
         welcomeLabel.setForeground(SolumBaseGUI.NEON_PURPLE);
 
         headerPanel.add(welcomeLabel);
-        add(headerPanel, BorderLayout.NORTH);
+        topPanel.add(headerPanel, BorderLayout.NORTH);
+
+        JPanel summaryPanel = new JPanel(new GridLayout(1, 4, 18, 0));
+        summaryPanel.setBackground(SolumBaseGUI.BACKGROUND);
+        summaryPanel.setBorder(BorderFactory.createEmptyBorder(25, 60, 5, 60));
+
+        totalWorkoutsLabel = createStatCard("Total Workouts", "0");
+        totalCaloriesLabel = createStatCard("Total Calories", "0");
+        totalMinutesLabel = createStatCard("Total Minutes", "0");
+        lastWorkoutCaloriesLabel = createStatCard("Last Workout Calories", "0");
+
+        summaryPanel.add(totalWorkoutsLabel);
+        summaryPanel.add(totalCaloriesLabel);
+        summaryPanel.add(totalMinutesLabel);
+        summaryPanel.add(lastWorkoutCaloriesLabel);
+
+        topPanel.add(summaryPanel, BorderLayout.CENTER);
+        add(topPanel, BorderLayout.NORTH);
 
         JPanel menuPanel = new JPanel(new GridLayout(2, 2, 35, 35));
         menuPanel.setBackground(SolumBaseGUI.BACKGROUND);
-        menuPanel.setBorder(BorderFactory.createEmptyBorder(60, 60, 60, 60));
+        menuPanel.setBorder(BorderFactory.createEmptyBorder(45, 60, 60, 60));
 
         logWorkoutButton = new JButton("Log Workout");
         viewHistoryButton = new JButton("Workout History");
         profileButton = new JButton("Account and Profile");
         statsButton = new JButton("Workout Stats");
-        styleDashboardButton(statsButton);
 
         styleDashboardButton(logWorkoutButton);
         styleDashboardButton(viewHistoryButton);
         styleDashboardButton(profileButton);
+        styleDashboardButton(statsButton);
 
         menuPanel.add(logWorkoutButton);
         menuPanel.add(viewHistoryButton);
@@ -60,6 +85,43 @@ public class MainDashBoard extends JFrame {
 
         footerPanel.add(logoutButton);
         add(footerPanel, BorderLayout.SOUTH);
+    }
+
+    private JLabel createStatCard(String title, String value) {
+        JLabel label = new JLabel(
+                "<html><div style='text-align:center;'>"
+                        + "<span style='font-size:11px;'>" + title + "</span><br>"
+                        + "<span style='font-size:18px;'>" + value + "</span>"
+                        + "</div></html>",
+                SwingConstants.CENTER
+        );
+
+        label.setFont(SolumBaseGUI.TEXT_FONT.deriveFont(Font.BOLD, 16f));
+        label.setForeground(SolumBaseGUI.NEON_PURPLE);
+        label.setOpaque(true);
+        label.setBackground(SolumBaseGUI.FIELD_BACKGROUND);
+        label.setBorder(BorderFactory.createLineBorder(SolumBaseGUI.NEON_PURPLE, 2));
+        label.setPreferredSize(new Dimension(220, 85));
+
+        return label;
+    }
+
+    public void setDashboardStats(int totalWorkouts,
+                                  int totalCalories,
+                                  int totalMinutes,
+                                  int lastWorkoutCalories) {
+
+        totalWorkoutsLabel.setText(formatStatCard("Total Workouts", String.valueOf(totalWorkouts)));
+        totalCaloriesLabel.setText(formatStatCard("Total Calories", String.valueOf(totalCalories)));
+        totalMinutesLabel.setText(formatStatCard("Total Minutes", String.valueOf(totalMinutes)));
+        lastWorkoutCaloriesLabel.setText(formatStatCard("Last Workout Calories", String.valueOf(lastWorkoutCalories)));
+    }
+
+    private String formatStatCard(String title, String value) {
+        return "<html><div style='text-align:center;'>"
+                + "<span style='font-size:11px;'>" + title + "</span><br>"
+                + "<span style='font-size:18px;'>" + value + "</span>"
+                + "</div></html>";
     }
 
     private void styleDashboardButton(JButton button) {
@@ -96,7 +158,9 @@ public class MainDashBoard extends JFrame {
         profileButton.addActionListener(listener);
     }
 
-    public void addStatsListener(ActionListener listener) { statsButton.addActionListener(listener); }
+    public void addStatsListener(ActionListener listener) {
+        statsButton.addActionListener(listener);
+    }
 
     public void addLogoutListener(ActionListener listener) {
         logoutButton.addActionListener(listener);

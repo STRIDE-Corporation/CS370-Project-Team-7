@@ -1,6 +1,5 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.JOptionPane;
 
 public class LoginController {
 
@@ -34,7 +33,6 @@ public class LoginController {
             if (user != null) {
                 MainDashBoard dashboard = new MainDashBoard(user.getUsername());
 
-                // this is number 3
                 new DashboardController(dashboard, user, workoutManager, accountManager);
 
                 dashboard.setVisible(true);
@@ -59,15 +57,12 @@ public class LoginController {
     private class CloseListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-
-            int confirm = JOptionPane.showConfirmDialog(
+            boolean confirm = SolumBaseGUI.showConfirm(
                     loginView,
-                    "Are you sure you want to exit?",
-                    "Exit",
-                    JOptionPane.YES_NO_OPTION
+                    "Are you sure you want to exit?"
             );
 
-            if (confirm == JOptionPane.YES_OPTION) {
+            if (confirm) {
                 System.exit(0);
             }
         }

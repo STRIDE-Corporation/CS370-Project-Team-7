@@ -209,6 +209,46 @@ public class WorkoutManager {
         return 0;
     }
 
+    public int getTotalCalories(String username) {
+        String sql = "SELECT COALESCE(SUM(calories_burned), 0) AS total_calories FROM workouts WHERE username = ?";
+
+        try (Connection conn = db.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, username);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt("total_calories");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+
+    public int getTotalMinutes(String username) {
+        String sql = "SELECT COALESCE(SUM(duration), 0) AS total_minutes FROM workouts WHERE username = ?";
+
+        try (Connection conn = db.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, username);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt("total_minutes");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+
     public double getRecentAverageCaloriesBurned(String username, int limit) {
         String sql = """
             SELECT calories_burned
@@ -309,7 +349,7 @@ public class WorkoutManager {
             e.printStackTrace();
         }
 
-        return -1;
+        return 0;
     }
 
     public int getProjectedCalories(String username, UserProfile.Goal goal) {
@@ -363,7 +403,7 @@ public class WorkoutManager {
     public String getUserWorkoutHistory(String username) {
         StringBuilder history = new StringBuilder();
 
-        String workoutSql = "SELECT * FROM workouts WHERE username = ?";
+        String workoutSql = "SELECT * FROM workouts WHERE username = ? ORDER BY workout_datetime DESC";
         String exerciseSql = "SELECT * FROM exercise_entries WHERE workout_id = ?";
 
         try (Connection conn = db.connect();

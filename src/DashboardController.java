@@ -18,11 +18,29 @@ public class DashboardController {
         this.workoutManager = workoutManager;
         this.accountManager = accountManager;
 
+        refreshDashboardStats();
+
         this.dashboardView.addLogoutListener(new LogoutListener());
         this.dashboardView.addProfileListener(new ProfileListener());
         this.dashboardView.addViewHistoryListener(new HistoryListener());
         this.dashboardView.addLogWorkoutListener(new LogWorkoutListener());
         this.dashboardView.addStatsListener(new StatsListener());
+    }
+
+    private void refreshDashboardStats() {
+        String username = currentUser.getUsername();
+
+        int totalWorkouts = workoutManager.getWorkoutCount(username);
+        int totalCalories = workoutManager.getTotalCalories(username);
+        int totalMinutes = workoutManager.getTotalMinutes(username);
+        int lastWorkoutCalories = Math.max(0, workoutManager.getLatestWorkoutCalories(username));
+
+        dashboardView.setDashboardStats(
+                totalWorkouts,
+                totalCalories,
+                totalMinutes,
+                lastWorkoutCalories
+        );
     }
 
     private class LogoutListener implements ActionListener {
@@ -42,7 +60,6 @@ public class DashboardController {
             ProfileScreen profileScreen = new ProfileScreen(accountManager);
             new ProfileController(profileScreen, dashboardView, currentUser, accountManager);
 
-            // Makes Account and Profile page fullscreen
             profileScreen.setExtendedState(ProfileScreen.MAXIMIZED_BOTH);
             profileScreen.setVisible(true);
 

@@ -160,9 +160,7 @@ public class ProfileScreen extends JFrame {
     }
 
     private void saveUnitPreference(UserProfile.UnitPreference unitPreference) {
-        if (currentUser == null) {
-            return;
-        }
+        if (currentUser == null) return;
 
         boolean success = accountManager.updateUnitPreference(
                 currentUser.getUserID(),
@@ -173,19 +171,13 @@ public class ProfileScreen extends JFrame {
             currentUser.setUnitPreference(unitPreference);
             updateDisplayedUnits();
         } else {
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Could not save unit preference.",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE
-            );
+            // 🔥 FIXED POPUP (matches theme)
+            SolumBaseGUI.showError(this, "Could not save unit preference.");
         }
     }
 
     private void updateDisplayedUnits() {
-        if (currentUser == null) {
-            return;
-        }
+        if (currentUser == null) return;
 
         usernameLabel.setText("Username: " + currentUser.getUsername());
 

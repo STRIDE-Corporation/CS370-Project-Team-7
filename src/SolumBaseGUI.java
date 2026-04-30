@@ -15,7 +15,6 @@ public class SolumBaseGUI {
     public static final Color TEAL = new Color(0, 188, 174);
     public static final Color PURPLE = new Color(95, 93, 255);
 
-    // 🔥 Indigo Tron Theme
     public static final Color NEON_PURPLE = new Color(160, 90, 255);
     public static final Color GLOW_STRONG = new Color(210, 160, 255);
 
@@ -31,7 +30,6 @@ public class SolumBaseGUI {
     public static Font TEXT_FONT;
     public static Font BUTTON_FONT;
 
-    // 🔥 Window Styles
     public static void styleFrame(JFrame frame) {
         frame.setSize(1100, 700);
         frame.setMinimumSize(new Dimension(900, 600));
@@ -46,7 +44,6 @@ public class SolumBaseGUI {
         frame.getContentPane().setBackground(BACKGROUND);
     }
 
-    // 🔥 Global Font Apply
     private static void applyGlobalFont(Font font) {
         FontUIResource uiFont = new FontUIResource(font);
 
@@ -61,7 +58,6 @@ public class SolumBaseGUI {
         }
     }
 
-    // 🔥 Font Helpers (THIS is what you use in other files)
     public static Font title(float size) {
         return TITLE_FONT.deriveFont(Font.BOLD, size);
     }
@@ -74,21 +70,57 @@ public class SolumBaseGUI {
         return BUTTON_FONT.deriveFont(Font.BOLD, size);
     }
 
-    // 🔥 NEW: Apply neon styling to charts (THIS is what you wanted)
-    public static void styleChart(JFreeChart chart) {
+    // 🔥 Themed popup helpers
+    public static void showError(Component parent, String message) {
+        showThemedDialog(parent, "Error", message, JOptionPane.ERROR_MESSAGE);
+    }
 
-        // Background
+    public static void showMessage(Component parent, String message) {
+        showThemedDialog(parent, "Message", message, JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    public static boolean showConfirm(Component parent, String message) {
+        applyPopupTheme();
+
+        int result = JOptionPane.showConfirmDialog(
+                parent,
+                message,
+                "Confirm",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE
+        );
+
+        return result == JOptionPane.YES_OPTION;
+    }
+
+    private static void showThemedDialog(Component parent, String title, String message, int type) {
+        applyPopupTheme();
+        JOptionPane.showMessageDialog(parent, message, title, type);
+    }
+
+    private static void applyPopupTheme() {
+        UIManager.put("OptionPane.background", BACKGROUND);
+        UIManager.put("Panel.background", BACKGROUND);
+        UIManager.put("OptionPane.messageForeground", WHITE);
+        UIManager.put("OptionPane.messageFont", text(18f));
+        UIManager.put("OptionPane.buttonFont", button(14f));
+
+        UIManager.put("Button.background", BUTTON_BACKGROUND);
+        UIManager.put("Button.foreground", NEON_PURPLE);
+        UIManager.put("Button.focus", GLOW_STRONG);
+        UIManager.put("Button.border", BorderFactory.createLineBorder(NEON_PURPLE, 2));
+    }
+
+    public static void styleChart(JFreeChart chart) {
         chart.setBackgroundPaint(BACKGROUND);
 
         CategoryPlot plot = chart.getCategoryPlot();
         plot.setBackgroundPaint(new Color(20, 20, 30));
         plot.setOutlineVisible(false);
 
-        // Gridlines
         plot.setRangeGridlinePaint(NEON_PURPLE.darker());
         plot.setDomainGridlinesVisible(false);
 
-        // Axes
         CategoryAxis domainAxis = plot.getDomainAxis();
         NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
 
@@ -102,20 +134,17 @@ public class SolumBaseGUI {
         rangeAxis.setLabelPaint(WHITE);
         rangeAxis.setTickLabelPaint(WHITE);
 
-        // Title font
         if (chart.getTitle() != null) {
             chart.getTitle().setFont(title(24f));
             chart.getTitle().setPaint(NEON_PURPLE);
         }
 
-        // Legend
         if (chart.getLegend() != null) {
             chart.getLegend().setItemFont(text(14f));
             chart.getLegend().setBackgroundPaint(BACKGROUND);
             chart.getLegend().setItemPaint(WHITE);
         }
 
-        // 🔥 Neon Bar Renderer (THIS is the glow look)
         BarRenderer renderer = (BarRenderer) plot.getRenderer();
 
         GradientPaint neonGradient = new GradientPaint(
@@ -124,13 +153,8 @@ public class SolumBaseGUI {
         );
 
         renderer.setSeriesPaint(0, neonGradient);
-
-        // Remove ugly outlines
         renderer.setDrawBarOutline(false);
-
-        // Slight transparency glow effect
-        renderer.setShadowVisible(true);
-        renderer.setShadowPaint(new Color(160, 90, 255, 120));
+        renderer.setShadowVisible(false);
     }
 
     static {

@@ -16,7 +16,7 @@ public class LoginScreen extends JFrame {
 
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBackground(SolumBaseGUI.BACKGROUND);
-        panel.setBorder(BorderFactory.createEmptyBorder(60, 60, 60, 60));
+        panel.setBorder(BorderFactory.createEmptyBorder(60, 60, 40, 60));
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -40,17 +40,15 @@ public class LoginScreen extends JFrame {
         JLabel usernameLabel = createCenteredLabel("Username");
         JLabel passwordLabel = createCenteredLabel("Password");
 
-        // 🔥 BUTTONS
-        loginButton = new JButton("Log In");        // BIG bottom button
+        loginButton = new JButton("Log In");
         registerButton = new JButton("Register Account");
-        closeButton = new JButton("Close App");    // SMALL top button
+        closeButton = new JButton("Close App");
 
         styleButton(loginButton);
         styleButton(registerButton);
         styleButton(closeButton);
 
-        // 🔥 Layout
-
+        // Layout
         gbc.gridy = 0;
         gbc.insets = new Insets(5, 10, 0, 10);
         panel.add(titleLabel, gbc);
@@ -75,26 +73,33 @@ public class LoginScreen extends JFrame {
         gbc.insets = new Insets(0, 120, 25, 120);
         panel.add(passwordField, gbc);
 
-        // 🔥 ROW: small buttons
+        // Buttons row
         gbc.gridy++;
         gbc.gridwidth = 1;
         gbc.insets = new Insets(10, 10, 10, 10);
 
         gbc.gridx = 0;
-        panel.add(closeButton, gbc);       // 👈 NOW Close App (small)
+        panel.add(closeButton, gbc);
 
         gbc.gridx = 1;
-        panel.add(registerButton, gbc);    // Register stays
+        panel.add(registerButton, gbc);
 
-        // 🔥 ROW: BIG button (was Close, now Login)
+        // Big login button
         gbc.gridy++;
         gbc.gridx = 0;
         gbc.gridwidth = 2;
-        gbc.insets = new Insets(10, 10, 10, 10);
-        panel.add(loginButton, gbc);       // 👈 NOW Log In (big)
+        panel.add(loginButton, gbc);
+
+        // Version label
+        JLabel versionLabel = new JLabel("v1.0.0", SwingConstants.CENTER);
+        versionLabel.setFont(SolumBaseGUI.TEXT_FONT.deriveFont(11f));
+        versionLabel.setForeground(new Color(150, 120, 200));
+
+        gbc.gridy++;
+        gbc.insets = new Insets(20, 10, 0, 10);
+        panel.add(versionLabel, gbc);
 
         add(panel);
-
         SolumBaseGUI.styleFrame(this);
     }
 
@@ -134,31 +139,15 @@ public class LoginScreen extends JFrame {
         });
     }
 
-    // Getters
+    public String getUsername() { return usernameField.getText(); }
+    public String getPassword() { return new String(passwordField.getPassword()); }
 
-    public String getUsername() {
-        return usernameField.getText();
-    }
+    public void addLoginListener(ActionListener l) { loginButton.addActionListener(l); }
+    public void addRegisterListener(ActionListener l) { registerButton.addActionListener(l); }
+    public void addCloseListener(ActionListener l) { closeButton.addActionListener(l); }
 
-    public String getPassword() {
-        return new String(passwordField.getPassword());
-    }
-
-    // Listeners
-
-    public void addLoginListener(ActionListener listener) {
-        loginButton.addActionListener(listener);
-    }
-
-    public void addRegisterListener(ActionListener listener) {
-        registerButton.addActionListener(listener);
-    }
-
-    public void addCloseListener(ActionListener listener) {
-        closeButton.addActionListener(listener);
-    }
-
+    // 🔥 UPDATED POPUP
     public void displayErrorMessage(String message) {
-        JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
+        SolumBaseGUI.showError(this, message);
     }
 }
