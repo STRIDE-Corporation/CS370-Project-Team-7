@@ -13,6 +13,7 @@ public class EditProfileScreen extends JFrame {
 
     private JButton saveButton;
     private JButton cancelButton;
+    private JButton deleteButton;
 
     public EditProfileScreen() {
         setTitle("Edit Account and Profile");
@@ -59,6 +60,7 @@ public class EditProfileScreen extends JFrame {
 
         saveButton = createStyledButton("Save Changes");
         cancelButton = createStyledButton("Cancel");
+        deleteButton = createStyledButton("Delete Profile");
 
         gbc.gridy = 5;
         gbc.gridwidth = 1;
@@ -68,6 +70,11 @@ public class EditProfileScreen extends JFrame {
 
         gbc.gridx = 1;
         cardPanel.add(cancelButton, gbc);
+
+        gbc.gridy = 6;
+        gbc.gridx = 0;
+        gbc.gridwidth = 2;
+        cardPanel.add(deleteButton, gbc);
 
         outerPanel.add(cardPanel);
         add(outerPanel);
@@ -175,6 +182,8 @@ public class EditProfileScreen extends JFrame {
     public void addCancelListener(ActionListener listener) {
         cancelButton.addActionListener(listener);
     }
+
+    public void addDeleteListener(ActionListener listener) { deleteButton.addActionListener(listener); }
 
     public void showMessage(String msg) {
         JOptionPane.showMessageDialog(this, msg);
