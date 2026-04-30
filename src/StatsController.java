@@ -50,7 +50,6 @@ public class StatsController {
 
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
-        // ✅ FIXED GENERICS WARNING HERE
         for (int r = 0; r < original.getRowCount(); r++) {
             Comparable<?> rowKey = original.getRowKey(r);
 
@@ -93,13 +92,11 @@ public class StatsController {
         CategoryPlot plot = chart.getCategoryPlot();
         BarRenderer renderer = (BarRenderer) plot.getRenderer();
 
-        // 🔥 PURPLE GLOW (workouts)
         GradientPaint workoutGradient = new GradientPaint(
                 0f, 0f, SolumBaseGUI.GLOW_STRONG,
                 0f, 180f, SolumBaseGUI.NEON_PURPLE
         );
 
-        // 🔥 BLUE PROJECTION
         GradientPaint projectionGradient = new GradientPaint(
                 0f, 0f, new Color(90, 210, 255),
                 0f, 180f, new Color(5, 70, 190)
@@ -116,7 +113,6 @@ public class StatsController {
         renderer.setSeriesOutlinePaint(1, new Color(150, 230, 255));
         renderer.setSeriesOutlineStroke(1, new BasicStroke(3.5f));
 
-        // ❌ REMOVE SHADOW BAR (your issue earlier)
         renderer.setShadowVisible(false);
 
         renderer.setItemMargin(0.05);
@@ -124,7 +120,6 @@ public class StatsController {
 
         applyCustomLegend(plot);
 
-        // 🔥 TARGET RANGE BAND
         if (projectedCalories != -1) {
             int minTarget = (int) Math.round(projectedCalories * 0.9);
             int maxTarget = (int) Math.round(projectedCalories * 1.1);

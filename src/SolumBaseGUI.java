@@ -70,7 +70,6 @@ public class SolumBaseGUI {
         return BUTTON_FONT.deriveFont(Font.BOLD, size);
     }
 
-    // 🔥 Themed popup helpers
     public static void showError(Component parent, String message) {
         showThemedDialog(parent, "Error", message, JOptionPane.ERROR_MESSAGE);
     }

@@ -11,7 +11,6 @@ public class Main {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        //code we had before upgrade, is onwards.
         SwingUtilities.invokeLater(() -> {
 
             //initialize database
