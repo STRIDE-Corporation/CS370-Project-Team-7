@@ -33,7 +33,7 @@ public class LogWorkoutScreen extends JFrame {
         setLayout(new BorderLayout(10, 10));
         getContentPane().setBackground(SolumBaseGUI.BACKGROUND);
 
-        JPanel inputPanel = new JPanel(new GridLayout(7, 2, 12, 12));
+        JPanel inputPanel = new JPanel(new GridLayout(6, 2, 12, 12));
         inputPanel.setBackground(SolumBaseGUI.BACKGROUND);
         inputPanel.setBorder(BorderFactory.createEmptyBorder(25, 35, 15, 35));
 
@@ -65,7 +65,34 @@ public class LogWorkoutScreen extends JFrame {
         inputPanel.add(createLabel("Estimated Calories Burned:"));
         inputPanel.add(caloriesEstimateLabel);
 
-        notesArea = new JTextArea(3, 20);
+        addExerciseButton = new JButton("Add Exercise");
+        finishWorkoutButton = new JButton("Finish Workout");
+
+        styleButton(addExerciseButton);
+        styleButton(finishWorkoutButton);
+
+        inputPanel.add(addExerciseButton);
+        inputPanel.add(finishWorkoutButton);
+
+        exerciseListArea = new JTextArea();
+        exerciseListArea.setEditable(false);
+        exerciseListArea.setFont(SolumBaseGUI.TEXT_FONT);
+        exerciseListArea.setBackground(SolumBaseGUI.FIELD_BACKGROUND);
+        exerciseListArea.setForeground(SolumBaseGUI.WHITE);
+        exerciseListArea.setCaretColor(SolumBaseGUI.WHITE);
+        exerciseListArea.setBorder(BorderFactory.createLineBorder(SolumBaseGUI.NEON_PURPLE, 1));
+
+        JScrollPane exerciseScrollPane = new JScrollPane(exerciseListArea);
+        exerciseScrollPane.setBorder(BorderFactory.createLineBorder(SolumBaseGUI.NEON_PURPLE, 2));
+        exerciseScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+
+        JPanel notesPanel = new JPanel(new BorderLayout(10, 10));
+        notesPanel.setBackground(SolumBaseGUI.BACKGROUND);
+        notesPanel.setBorder(BorderFactory.createEmptyBorder(10, 35, 10, 35));
+
+        JLabel notesLabel = createLabel("Workout Notes:");
+
+        notesArea = new JTextArea(4, 20);
         notesArea.setFont(SolumBaseGUI.TEXT_FONT);
         notesArea.setBackground(SolumBaseGUI.FIELD_BACKGROUND);
         notesArea.setForeground(SolumBaseGUI.WHITE);
@@ -85,41 +112,28 @@ public class LogWorkoutScreen extends JFrame {
             }
         });
 
-        JScrollPane notesScroll = new JScrollPane(notesArea);
+        JScrollPane notesScrollPane = new JScrollPane(notesArea);
+        notesScrollPane.setBorder(BorderFactory.createLineBorder(SolumBaseGUI.NEON_PURPLE, 2));
 
-        inputPanel.add(createLabel("Workout Notes:"));
-        inputPanel.add(notesScroll);
+        notesPanel.add(notesLabel, BorderLayout.NORTH);
+        notesPanel.add(notesScrollPane, BorderLayout.CENTER);
 
-        addExerciseButton = new JButton("Add Exercise");
-        finishWorkoutButton = new JButton("Finish Workout");
         backButton = new JButton("Back");
-
-        styleButton(addExerciseButton);
-        styleButton(finishWorkoutButton);
         styleButton(backButton);
 
-        inputPanel.add(addExerciseButton);
-        inputPanel.add(finishWorkoutButton);
-
-        exerciseListArea = new JTextArea();
-        exerciseListArea.setEditable(false);
-        exerciseListArea.setFont(SolumBaseGUI.TEXT_FONT);
-        exerciseListArea.setBackground(SolumBaseGUI.FIELD_BACKGROUND);
-        exerciseListArea.setForeground(SolumBaseGUI.WHITE);
-        exerciseListArea.setCaretColor(SolumBaseGUI.WHITE);
-        exerciseListArea.setBorder(BorderFactory.createLineBorder(SolumBaseGUI.NEON_PURPLE, 1));
-
-        JScrollPane scrollPane = new JScrollPane(exerciseListArea);
-        scrollPane.setBorder(BorderFactory.createLineBorder(SolumBaseGUI.NEON_PURPLE, 2));
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-
-        JPanel bottomPanel = new JPanel();
+        JPanel bottomPanel = new JPanel(new BorderLayout(10, 10));
         bottomPanel.setBackground(SolumBaseGUI.BACKGROUND);
-        bottomPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
-        bottomPanel.add(backButton);
+        bottomPanel.setBorder(BorderFactory.createEmptyBorder(0, 20, 20, 20));
+
+        JPanel backPanel = new JPanel();
+        backPanel.setBackground(SolumBaseGUI.BACKGROUND);
+        backPanel.add(backButton);
+
+        bottomPanel.add(notesPanel, BorderLayout.CENTER);
+        bottomPanel.add(backPanel, BorderLayout.SOUTH);
 
         add(inputPanel, BorderLayout.NORTH);
-        add(scrollPane, BorderLayout.CENTER);
+        add(exerciseScrollPane, BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
     }
 

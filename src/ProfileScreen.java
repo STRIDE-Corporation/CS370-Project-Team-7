@@ -4,6 +4,9 @@ import java.awt.event.ActionListener;
 
 public class ProfileScreen extends JFrame {
 
+    private static final double INCHES_TO_CM = 2.54;
+    private static final double LBS_TO_KG = 0.45359237;
+
     private JLabel usernameLabel;
     private JLabel heightLabel;
     private JLabel weightLabel;
@@ -187,11 +190,11 @@ public class ProfileScreen extends JFrame {
         usernameLabel.setText("Username: " + currentUser.getUsername());
 
         if (currentUser.getUnitPreference() == UserProfile.UnitPreference.METRIC) {
-            int heightCm = (int) Math.round(currentUser.getHeight() * 2.54);
-            int weightKg = (int) Math.round(currentUser.getWeight() * 0.453592);
+            double heightCm = currentUser.getHeight() * INCHES_TO_CM;
+            double weightKg = currentUser.getWeight() * LBS_TO_KG;
 
-            heightLabel.setText("Height: " + heightCm + " cm");
-            weightLabel.setText("Weight: " + weightKg + " kg");
+            heightLabel.setText("Height: " + formatOneDecimal(heightCm) + " cm");
+            weightLabel.setText("Weight: " + formatOneDecimal(weightKg) + " kg");
             unitPreferenceLabel.setText("Display Units: Metric");
         } else {
             heightLabel.setText("Height: " + currentUser.getHeight() + " in");
@@ -200,6 +203,10 @@ public class ProfileScreen extends JFrame {
         }
 
         goalLabel.setText("Goal: " + currentUser.getGoal().name());
+    }
+
+    private String formatOneDecimal(double value) {
+        return String.format("%.1f", value);
     }
 
     public void addEditListener(ActionListener listener) {

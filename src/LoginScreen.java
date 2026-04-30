@@ -40,15 +40,16 @@ public class LoginScreen extends JFrame {
         JLabel usernameLabel = createCenteredLabel("Username");
         JLabel passwordLabel = createCenteredLabel("Password");
 
-        loginButton = new JButton("Log In");
+        // 🔥 BUTTONS
+        loginButton = new JButton("Log In");        // BIG bottom button
         registerButton = new JButton("Register Account");
-        closeButton = new JButton("Close App");
+        closeButton = new JButton("Close App");    // SMALL top button
 
         styleButton(loginButton);
         styleButton(registerButton);
         styleButton(closeButton);
 
-        // Layout
+        // 🔥 Layout
 
         gbc.gridy = 0;
         gbc.insets = new Insets(5, 10, 0, 10);
@@ -74,25 +75,26 @@ public class LoginScreen extends JFrame {
         gbc.insets = new Insets(0, 120, 25, 120);
         panel.add(passwordField, gbc);
 
+        // 🔥 ROW: small buttons
         gbc.gridy++;
         gbc.gridwidth = 1;
         gbc.insets = new Insets(10, 10, 10, 10);
 
         gbc.gridx = 0;
-        panel.add(loginButton, gbc);
+        panel.add(closeButton, gbc);       // 👈 NOW Close App (small)
 
         gbc.gridx = 1;
-        panel.add(registerButton, gbc);
+        panel.add(registerButton, gbc);    // Register stays
 
+        // 🔥 ROW: BIG button (was Close, now Login)
         gbc.gridy++;
         gbc.gridx = 0;
         gbc.gridwidth = 2;
         gbc.insets = new Insets(10, 10, 10, 10);
-        panel.add(closeButton, gbc);
+        panel.add(loginButton, gbc);       // 👈 NOW Log In (big)
 
         add(panel);
 
-        // 🔥 THIS is the key (bigger + consistent across app)
         SolumBaseGUI.styleFrame(this);
     }
 

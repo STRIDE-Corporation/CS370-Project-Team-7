@@ -1,18 +1,24 @@
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.GradientPaint;
+import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.geom.Rectangle2D;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.LegendItem;
+import org.jfree.chart.LegendItemCollection;
+import org.jfree.chart.axis.CategoryAxis;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.block.BlockBorder;
 import org.jfree.chart.plot.CategoryPlot;
-import org.jfree.chart.plot.ValueMarker;
+import org.jfree.chart.plot.IntervalMarker;
 import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.ui.Layer;
-import org.jfree.ui.RectangleAnchor;
-import org.jfree.ui.TextAnchor;
 
 public class StatsController {
 
@@ -38,8 +44,28 @@ public class StatsController {
     }
 
     private ChartPanel createChart() {
-        DefaultCategoryDataset dataset =
+
+        DefaultCategoryDataset original =
                 workoutManager.getCaloriesDataset(currentUser.getUsername());
+
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+
+        for (int r = 0; r < original.getRowCount(); r++) {
+            Comparable rowKey = original.getRowKey(r);
+
+            for (int c = 0; c < original.getColumnCount(); c++) {
+                Comparable colKey = original.getColumnKey(c);
+
+                if (!colKey.toString().equalsIgnoreCase("Next Workout")
+                        && !colKey.toString().equalsIgnoreCase("Projection")) {
+
+                    Number value = original.getValue(r, c);
+                    if (value != null) {
+                        dataset.addValue(value, rowKey, colKey);
+                    }
+                }
+            }
+        }
 
         int projectedCalories = workoutManager.getProjectedCalories(
                 currentUser.getUsername(),
@@ -47,11 +73,7 @@ public class StatsController {
         );
 
         if (projectedCalories != -1) {
-            dataset.addValue(
-                    projectedCalories,
-                    "Next Workout Projection",
-                    "Next Workout"
-            );
+            dataset.addValue(projectedCalories, "Next Workout Projection", "Projection");
         }
 
         JFreeChart chart = ChartFactory.createBarChart(
@@ -65,44 +87,134 @@ public class StatsController {
                 false
         );
 
-        CategoryPlot plot = chart.getCategoryPlot();
-        plot.setBackgroundPaint(new Color(35, 35, 40));
-        plot.setRangeGridlinePaint(new Color(90, 90, 95));
+        applyOrbitronChartStyle(chart);
 
+        CategoryPlot plot = chart.getCategoryPlot();
         BarRenderer renderer = (BarRenderer) plot.getRenderer();
-        renderer.setSeriesPaint(0, new Color(255, 80, 80));
-        renderer.setSeriesPaint(1, SolumBaseGUI.NEON_PURPLE);
+
+        GradientPaint workoutGradient = new GradientPaint(
+                0f, 0f, SolumBaseGUI.GLOW_STRONG,
+                0f, 180f, SolumBaseGUI.NEON_PURPLE
+        );
+
+        GradientPaint projectionGradient = new GradientPaint(
+                0f, 0f, new Color(90, 210, 255),
+                0f, 180f, new Color(5, 70, 190)
+        );
+
+        renderer.setSeriesPaint(0, workoutGradient);
+        renderer.setSeriesPaint(1, projectionGradient);
+
+        renderer.setDrawBarOutline(true);
+        renderer.setSeriesOutlinePaint(0, new Color(230, 190, 255));
+        renderer.setSeriesOutlineStroke(0, new BasicStroke(2.2f));
+
+        renderer.setSeriesOutlinePaint(1, new Color(150, 230, 255));
+        renderer.setSeriesOutlineStroke(1, new BasicStroke(3.2f));
+
+        // Removes the fake bar behind each column
+        renderer.setShadowVisible(false);
+
+        renderer.setItemMargin(0.06);
+        renderer.setMaximumBarWidth(0.075);
+
+        applyCustomLegend(plot);
 
         if (projectedCalories != -1) {
             int minTarget = (int) Math.round(projectedCalories * 0.9);
             int maxTarget = (int) Math.round(projectedCalories * 1.1);
 
-            addTargetMarker(plot, minTarget, "Min Target (" + minTarget + ")");
-            addTargetMarker(plot, maxTarget, "Max Target (" + maxTarget + ")");
+            addTargetRangeBand(plot, minTarget, maxTarget);
         }
 
-        return new ChartPanel(chart);
+        ChartPanel chartPanel = new ChartPanel(chart);
+        chartPanel.setBackground(SolumBaseGUI.BACKGROUND);
+        chartPanel.setOpaque(true);
+        chartPanel.setBorder(null);
+
+        return chartPanel;
     }
 
-    private void addTargetMarker(CategoryPlot plot, int value, String label) {
-        ValueMarker marker = new ValueMarker(value);
+    private void applyCustomLegend(CategoryPlot plot) {
+        LegendItemCollection legendItems = new LegendItemCollection();
+        Shape box = new Rectangle2D.Double(-4, -4, 8, 8);
 
-        marker.setPaint(new Color(0, 220, 160));
-        marker.setStroke(new BasicStroke(
-                2.5f,
-                BasicStroke.CAP_ROUND,
-                BasicStroke.JOIN_ROUND,
-                1.0f,
-                new float[]{10.0f, 6.0f},
-                0.0f
+        legendItems.add(new LegendItem(
+                "Actual Calories",
+                "Calories burned in logged workouts",
+                null,
+                null,
+                box,
+                SolumBaseGUI.NEON_PURPLE
         ));
 
-        marker.setLabel(label);
-        marker.setLabelPaint(new Color(0, 220, 160));
-        marker.setLabelAnchor(RectangleAnchor.RIGHT);
-        marker.setLabelTextAnchor(TextAnchor.CENTER_RIGHT);
+        legendItems.add(new LegendItem(
+                "Next Workout Projection",
+                "Projected calorie target for your next workout",
+                null,
+                null,
+                box,
+                new Color(50, 160, 255)
+        ));
 
-        plot.addRangeMarker(marker, Layer.FOREGROUND);
+        legendItems.add(new LegendItem(
+                "Target Range",
+                "Recommended minimum and maximum calorie range",
+                null,
+                null,
+                box,
+                new Color(0, 220, 160)
+        ));
+
+        plot.setFixedLegendItems(legendItems);
+    }
+
+    private void applyOrbitronChartStyle(JFreeChart chart) {
+        chart.setBackgroundPaint(SolumBaseGUI.BACKGROUND);
+
+        if (chart.getTitle() != null) {
+            chart.getTitle().setFont(SolumBaseGUI.title(24f));
+            chart.getTitle().setPaint(SolumBaseGUI.WHITE);
+        }
+
+        CategoryPlot plot = chart.getCategoryPlot();
+        plot.setBackgroundPaint(SolumBaseGUI.BACKGROUND);
+        plot.setOutlineVisible(false);
+        plot.setRangeGridlinePaint(new Color(55, 45, 75));
+
+        CategoryAxis domainAxis = plot.getDomainAxis();
+        domainAxis.setLabelFont(SolumBaseGUI.button(16f));
+        domainAxis.setTickLabelFont(SolumBaseGUI.text(13f));
+        domainAxis.setLabelPaint(SolumBaseGUI.WHITE);
+        domainAxis.setTickLabelPaint(SolumBaseGUI.WHITE);
+        domainAxis.setAxisLinePaint(SolumBaseGUI.NEON_PURPLE);
+        domainAxis.setTickMarkPaint(SolumBaseGUI.NEON_PURPLE);
+
+        NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
+        rangeAxis.setLabelFont(SolumBaseGUI.button(16f));
+        rangeAxis.setTickLabelFont(SolumBaseGUI.text(13f));
+        rangeAxis.setLabelPaint(SolumBaseGUI.WHITE);
+        rangeAxis.setTickLabelPaint(SolumBaseGUI.WHITE);
+        rangeAxis.setAxisLinePaint(SolumBaseGUI.NEON_PURPLE);
+        rangeAxis.setTickMarkPaint(SolumBaseGUI.NEON_PURPLE);
+
+        if (chart.getLegend() != null) {
+            chart.getLegend().setItemFont(SolumBaseGUI.text(13f));
+            chart.getLegend().setItemPaint(SolumBaseGUI.WHITE);
+            chart.getLegend().setBackgroundPaint(SolumBaseGUI.BACKGROUND);
+            chart.getLegend().setFrame(new BlockBorder(SolumBaseGUI.BACKGROUND));
+        }
+    }
+
+    private void addTargetRangeBand(CategoryPlot plot, int min, int max) {
+        IntervalMarker band = new IntervalMarker(min, max);
+
+        band.setPaint(new Color(0, 220, 160, 45));
+        band.setOutlinePaint(new Color(0, 220, 160));
+        band.setOutlineStroke(new BasicStroke(2.0f));
+
+        // Behind the bars so it looks like a clean target zone
+        plot.addRangeMarker(band, Layer.BACKGROUND);
     }
 
     private void setPersonalizedInsight() {

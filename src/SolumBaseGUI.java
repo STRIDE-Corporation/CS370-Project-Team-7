@@ -1,9 +1,14 @@
-import javax.swing.JFrame;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GraphicsEnvironment;
+import javax.swing.*;
+import javax.swing.plaf.FontUIResource;
+import java.awt.*;
 import java.io.InputStream;
+import java.util.Enumeration;
+
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.renderer.category.BarRenderer;
+import org.jfree.chart.axis.CategoryAxis;
+import org.jfree.chart.axis.NumberAxis;
 
 public class SolumBaseGUI {
 
@@ -26,18 +31,106 @@ public class SolumBaseGUI {
     public static Font TEXT_FONT;
     public static Font BUTTON_FONT;
 
-    // 🔥 Standard window (Login / Register / etc.)
+    // 🔥 Window Styles
     public static void styleFrame(JFrame frame) {
         frame.setSize(1100, 700);
         frame.setMinimumSize(new Dimension(900, 600));
         frame.setLocationRelativeTo(null);
+        frame.getContentPane().setBackground(BACKGROUND);
     }
 
-    // 🔥 Fullscreen (Dashboard)
     public static void styleFrameFullscreen(JFrame frame) {
         frame.setMinimumSize(new Dimension(900, 600));
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         frame.setLocationRelativeTo(null);
+        frame.getContentPane().setBackground(BACKGROUND);
+    }
+
+    // 🔥 Global Font Apply
+    private static void applyGlobalFont(Font font) {
+        FontUIResource uiFont = new FontUIResource(font);
+
+        Enumeration<Object> keys = UIManager.getDefaults().keys();
+        while (keys.hasMoreElements()) {
+            Object key = keys.nextElement();
+            Object value = UIManager.get(key);
+
+            if (value instanceof FontUIResource) {
+                UIManager.put(key, uiFont);
+            }
+        }
+    }
+
+    // 🔥 Font Helpers (THIS is what you use in other files)
+    public static Font title(float size) {
+        return TITLE_FONT.deriveFont(Font.BOLD, size);
+    }
+
+    public static Font text(float size) {
+        return TEXT_FONT.deriveFont(Font.PLAIN, size);
+    }
+
+    public static Font button(float size) {
+        return BUTTON_FONT.deriveFont(Font.BOLD, size);
+    }
+
+    // 🔥 NEW: Apply neon styling to charts (THIS is what you wanted)
+    public static void styleChart(JFreeChart chart) {
+
+        // Background
+        chart.setBackgroundPaint(BACKGROUND);
+
+        CategoryPlot plot = chart.getCategoryPlot();
+        plot.setBackgroundPaint(new Color(20, 20, 30));
+        plot.setOutlineVisible(false);
+
+        // Gridlines
+        plot.setRangeGridlinePaint(NEON_PURPLE.darker());
+        plot.setDomainGridlinesVisible(false);
+
+        // Axes
+        CategoryAxis domainAxis = plot.getDomainAxis();
+        NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
+
+        domainAxis.setLabelFont(text(16f));
+        domainAxis.setTickLabelFont(text(14f));
+        domainAxis.setLabelPaint(WHITE);
+        domainAxis.setTickLabelPaint(WHITE);
+
+        rangeAxis.setLabelFont(text(16f));
+        rangeAxis.setTickLabelFont(text(14f));
+        rangeAxis.setLabelPaint(WHITE);
+        rangeAxis.setTickLabelPaint(WHITE);
+
+        // Title font
+        if (chart.getTitle() != null) {
+            chart.getTitle().setFont(title(24f));
+            chart.getTitle().setPaint(NEON_PURPLE);
+        }
+
+        // Legend
+        if (chart.getLegend() != null) {
+            chart.getLegend().setItemFont(text(14f));
+            chart.getLegend().setBackgroundPaint(BACKGROUND);
+            chart.getLegend().setItemPaint(WHITE);
+        }
+
+        // 🔥 Neon Bar Renderer (THIS is the glow look)
+        BarRenderer renderer = (BarRenderer) plot.getRenderer();
+
+        GradientPaint neonGradient = new GradientPaint(
+                0f, 0f, new Color(140, 80, 255),
+                0f, 300f, new Color(80, 40, 200)
+        );
+
+        renderer.setSeriesPaint(0, neonGradient);
+
+        // Remove ugly outlines
+        renderer.setDrawBarOutline(false);
+
+        // Slight transparency glow effect
+        renderer.setShadowVisible(true);
+        renderer.setShadowPaint(new Color(160, 90, 255, 120));
     }
 
     static {
@@ -59,7 +152,9 @@ public class SolumBaseGUI {
             TEXT_FONT = regularFont.deriveFont(18f);
             BUTTON_FONT = boldFont.deriveFont(16f);
 
-            System.out.println("Orbitron font loaded successfully!");
+            applyGlobalFont(TEXT_FONT);
+
+            System.out.println("Orbitron font loaded + applied globally!");
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -68,7 +163,9 @@ public class SolumBaseGUI {
             TEXT_FONT = new Font("SansSerif", Font.PLAIN, 18);
             BUTTON_FONT = new Font("SansSerif", Font.BOLD, 16);
 
-            System.out.println("Using fallback fonts (Orbitron failed)");
+            applyGlobalFont(TEXT_FONT);
+
+            System.out.println("Using fallback fonts");
         }
     }
 }
